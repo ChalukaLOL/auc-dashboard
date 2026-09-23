@@ -317,7 +317,7 @@
       </div>
       <div class="pager" id="auc-pager"></div>
       <div class="note">
-        คอลัมน์ "เหตุผล" และ "ผู้รับผิดชอบ" ถูกตัดออกเนื่องจากไม่มีข้อมูลหรือมีค่าเดียวซ้ำทุกแถวในไฟล์ต้นฉบับ · "รอบข้อมูล" คือชื่อไฟล์/ป้ายกำกับที่อัปโหลดเข้ามาแต่ละครั้ง เลือกดูย้อนหลังได้จากตัวกรองด้านบน
+        คอลัมน์ "เหตุผล" และ "ผู้รับผิดชอบ" ถูกตัดออกเนื่องจากไม่มีข้อมูลหรือมีค่าเดียวซ้ำทุกแถวในไฟล์ต้นฉบับ · "รอบข้อมูล" คือชื่อไฟล์/ป้ายกำกับที่อัปโหลดเข้ามาแต่ละครั้ง เลือกดูย้อนหลังได้จากตัวกรองด้านบน · เมื่อดู "ทั้งหมด (สะสมทุกรอบ)" ระบบจะไม่นับงานที่มีเลขงานซ้ำกันข้ามไฟล์สองครั้ง (นับครั้งเดียว) แต่ถ้าเลือกดูรอบข้อมูลใดรอบหนึ่งโดยเฉพาะ จะเห็นข้อมูลเต็มของไฟล์นั้นตามจริง
       </div>
     </div>
   </section>
@@ -977,6 +977,16 @@ function sortRows(rows, key, dir) {
 // =================================================================
 let aucState = { sortKey: 'มูลค่าคงค้าง', sortDir: 'desc', page: 1, pageSize: 25 };
 
+function dedupeByJobNumber(rows) {
+  const seen = new Map();
+  rows.forEach(r => {
+    const key = r['หมายเลขงาน'];
+    if (key === undefined || key === null || key === '') { seen.set(Symbol(), r); return; }
+    if (!seen.has(key)) seen.set(key, r);
+  });
+  return Array.from(seen.values());
+}
+
 function aucFiltered() {
   const search = document.getElementById('f-search').value.trim().toLowerCase();
   const period = document.getElementById('f-period').value;
@@ -985,8 +995,13 @@ function aucFiltered() {
   const status = document.getElementById('f-status').value;
   const tech = document.getElementById('f-tech').value;
 
-  return AUC_DATA.filter(r => {
-    if (period && r['__batchId'] !== period) return false;
+  // When viewing "all periods" combined, the same job can legitimately appear
+  // in more than one uploaded file (e.g. a superseding file that re-exports
+  // overlapping jobs). Dedupe by job number so totals aren't inflated.
+  // Viewing one specific period shows that file's data in full, untouched.
+  const base = period ? AUC_DATA.filter(r => r['__batchId'] === period) : dedupeByJobNumber(AUC_DATA);
+
+  return base.filter(r => {
     if (budget && r['budgetType'] !== budget && r['budget_type'] !== budget) return false;
     if (year && r['wbsYear'] !== year && r['wbs_year'] !== year) return false;
     if (status && r['สถานะระบบ'] !== status) return false;
@@ -1008,7 +1023,7 @@ function renderAucKpis(rows) {
   const open = total - closed;
 
   const kpis = [
-    {label:'จำนวนงานทั้งหมด', value: fmtNum(total), sub: `กรองจากทั้งหมด ${AUC_DATA.length} งาน`, accent:'steel'},
+    {label:'จำนวนงานทั้งหมด', value: fmtNum(total), sub: `กรองจากทั้งหมด ${dedupeByJobNumber(AUC_DATA).length} งาน (ไม่นับซ้ำ)`, accent:'steel'},
     {label:'มูลค่าคงค้างรวม (บาท)', value: fmtNum(outstanding), sub:'งานที่ยังไม่ปิดบัญชี', accent:'amber'},
     {label:'มูลค่าโอนปิดรวม (บาท)', value: fmtNum(transferred), sub:'งานที่โอนปิดแล้ว', accent:'teal'},
     {label:'% เบิกจ่ายวัสดุเฉลี่ย', value: fmtPct(avgMaterial), sub:'เฉลี่ยจากงานที่แสดงอยู่', accent:'steel'},
@@ -1051,7 +1066,7 @@ function renderAucCharts(rows) {
 
 function renderAucTable() {
   let rows = aucFiltered();
-  document.getElementById('auc-count-label').textContent = `แสดง ${rows.length} งาน จากทั้งหมด ${AUC_DATA.length} งาน`;
+  document.getElementById('auc-count-label').textContent = `แสดง ${rows.length} งาน จากทั้งหมด ${dedupeByJobNumber(AUC_DATA).length} งาน (ไม่นับซ้ำ)`;
   renderAucKpis(rows);
   renderAucCharts(rows);
 
@@ -1144,8 +1159,8 @@ function profitFiltered() {
   const search = document.getElementById('p-search').value.trim().toLowerCase();
   const period = document.getElementById('p-period').value;
   const status = document.getElementById('p-status').value;
-  return PROFIT_DATA.filter(r => {
-    if (period && r['__batchId'] !== period) return false;
+  const base = period ? PROFIT_DATA.filter(r => r['__batchId'] === period) : dedupeByJobNumber(PROFIT_DATA);
+  return base.filter(r => {
     if (status && r['สถานะระบบ'] !== status) return false;
     if (search) {
       const hay = (String(r['หมายเลขงาน']||'') + ' ' + String(r['คำอธิบาย']||'')).toLowerCase();
@@ -1163,7 +1178,7 @@ function renderProfitKpis(rows) {
   const avgMargin = rows.length ? rows.reduce((s,r)=>s+(Number(r['% Profit Margin'])||0),0)/rows.length : 0;
 
   const kpis = [
-    {label:'จำนวนงาน', value: fmtNum(total), sub:`จากทั้งหมด ${PROFIT_DATA.length} งาน`, accent:'steel'},
+    {label:'จำนวนงาน', value: fmtNum(total), sub:`จากทั้งหมด ${dedupeByJobNumber(PROFIT_DATA).length} งาน (ไม่นับซ้ำ)`, accent:'steel'},
     {label:'รายได้จริงรวม (บาท)', value: fmtNum(revenue), sub:'', accent:'steel'},
     {label:'ต้นทุนจริงรวม (บาท)', value: fmtNum(cost), sub:'', accent:'amber'},
     {label:'กำไรจริงรวม (บาท)', value: fmtNum(profit), sub:'', accent:'teal'},
@@ -1200,7 +1215,7 @@ function renderProfitCharts(rows) {
 
 function renderProfitTable() {
   let rows = profitFiltered();
-  document.getElementById('profit-count-label').textContent = `แสดง ${rows.length} งาน จากทั้งหมด ${PROFIT_DATA.length} งาน`;
+  document.getElementById('profit-count-label').textContent = `แสดง ${rows.length} งาน จากทั้งหมด ${dedupeByJobNumber(PROFIT_DATA).length} งาน (ไม่นับซ้ำ)`;
   renderProfitKpis(rows);
   renderProfitCharts(rows);
 
