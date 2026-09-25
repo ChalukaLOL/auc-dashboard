@@ -145,6 +145,36 @@
   }
   .reset-btn:hover { color: var(--text); border-color: var(--steel); }
 
+  /* ---- multi-select dropdown checklist ---- */
+  .ms-wrap { position: relative; min-width: 170px; }
+  .ms-toggle {
+    width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 7px 30px 7px 10px; font-size: 13px; color: var(--text);
+    font-family: inherit; cursor: pointer; position: relative; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .ms-toggle::after {
+    content: '▾'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text-dim); font-size: 11px;
+  }
+  .ms-toggle.active-filter { border-color: var(--steel); color: var(--steel); font-weight: 600; }
+  .ms-panel {
+    display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%;
+    max-width: 320px; max-height: 260px; overflow-y: auto; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; padding: 6px; z-index: 20;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  }
+  .ms-panel.open { display: block; }
+  .ms-option {
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 5px;
+    font-size: 12.5px; cursor: pointer; white-space: nowrap;
+  }
+  .ms-option:hover { background: var(--steel-light); }
+  .ms-option input { accent-color: var(--steel); cursor: pointer; }
+  .ms-actions { display: flex; justify-content: flex-end; padding: 4px 6px 2px; border-top: 1px dashed var(--border); margin-top: 4px; }
+  .ms-clear { background: none; border: none; color: var(--steel); font-size: 11.5px; cursor: pointer; font-family: inherit; padding: 2px 4px; }
+  .ms-clear:hover { text-decoration: underline; }
+
   .table-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12.5px; color: var(--text-dim); flex-wrap:wrap; gap:8px; }
 
   .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
@@ -245,6 +275,28 @@
 
     <div class="kpi-row" id="auc-kpis"></div>
 
+    <div class="panel">
+      <h2>เกณฑ์ประเมินผลงาน (% ปิดงานสำเร็จ) <span class="hint">เกณฑ์ผ่าน: A++ (≥78% ปิดงาน) · คำนวณจากข้อมูลรวมทุกรอบ ไม่นับซ้ำ</span></h2>
+      <div class="table-wrap">
+        <table id="grading-table">
+          <thead>
+            <tr>
+              <th>ประเภท</th>
+              <th class="num">งานทั้งหมด</th>
+              <th class="num">ปิดแล้ว (CLSD)</th>
+              <th class="num">% ปิดงาน</th>
+              <th>เกรด</th>
+              <th>ผลประเมิน</th>
+            </tr>
+          </thead>
+          <tbody id="grading-tbody"></tbody>
+        </table>
+      </div>
+      <div class="note">
+        เกรดคำนวณจาก % ของงานที่มีสถานะ "CLSD" (ปิดงานแล้ว) เทียบกับงานทั้งหมดในหมวดนั้น: A++ ≥78% (ผ่าน) · A+ ≥74% · A ≥70% · B+ ≥65% · B ≥60% · C+ ≥55% · C ≥50% · D+ ≥45% · D &lt;45% — เกณฑ์นี้เป็นค่าเริ่มต้นที่ตั้งไว้ให้ แก้ไขได้หากหน่วยงานมีเกณฑ์ทางการที่ต่างจากนี้
+      </div>
+    </div>
+
     <div class="charts-row">
       <div class="panel">
         <h2>จำนวนงานตามสถานะระบบ</h2>
@@ -262,7 +314,7 @@
     </div>
 
     <div class="panel">
-      <h2>ตัวกรอง</h2>
+      <h2>ตัวกรอง <span class="hint">(เลือกได้หลายรายการต่อช่อง)</span></h2>
       <div class="filters" id="auc-filters">
         <div class="filter-field">
           <label>ค้นหา (เลขงาน / รายละเอียด)</label>
@@ -270,23 +322,38 @@
         </div>
         <div class="filter-field">
           <label>รอบข้อมูล</label>
-          <select id="f-period"><option value="">ทั้งหมด (สะสมทุกรอบ)</option></select>
+          <div class="ms-wrap" id="f-period-wrap">
+            <button type="button" class="ms-toggle" id="f-period-toggle">ทั้งหมด</button>
+            <div class="ms-panel" id="f-period-panel"></div>
+          </div>
         </div>
         <div class="filter-field">
           <label>ประเภทงบ</label>
-          <select id="f-budget"><option value="">ทั้งหมด</option></select>
+          <div class="ms-wrap" id="f-budget-wrap">
+            <button type="button" class="ms-toggle" id="f-budget-toggle">ทั้งหมด</button>
+            <div class="ms-panel" id="f-budget-panel"></div>
+          </div>
         </div>
         <div class="filter-field">
           <label>ปีงบ</label>
-          <select id="f-year"><option value="">ทั้งหมด</option></select>
+          <div class="ms-wrap" id="f-year-wrap">
+            <button type="button" class="ms-toggle" id="f-year-toggle">ทั้งหมด</button>
+            <div class="ms-panel" id="f-year-panel"></div>
+          </div>
         </div>
         <div class="filter-field">
           <label>สถานะระบบ</label>
-          <select id="f-status"><option value="">ทั้งหมด</option></select>
+          <div class="ms-wrap" id="f-status-wrap">
+            <button type="button" class="ms-toggle" id="f-status-toggle">ทั้งหมด</button>
+            <div class="ms-panel" id="f-status-panel"></div>
+          </div>
         </div>
         <div class="filter-field">
           <label>ช่างผู้ควบคุมงาน</label>
-          <select id="f-tech"><option value="">ทั้งหมด</option></select>
+          <div class="ms-wrap" id="f-tech-wrap">
+            <button type="button" class="ms-toggle" id="f-tech-toggle">ทั้งหมด</button>
+            <div class="ms-panel" id="f-tech-panel"></div>
+          </div>
         </div>
         <button class="reset-btn" id="f-reset">ล้างตัวกรอง</button>
       </div>
@@ -343,7 +410,7 @@
     </div>
 
     <div class="panel">
-      <h2>ตัวกรอง</h2>
+      <h2>ตัวกรอง <span class="hint">(เลือกได้หลายรายการต่อช่อง)</span></h2>
       <div class="filters" id="profit-filters">
         <div class="filter-field">
           <label>ค้นหา (เลขงาน / รายละเอียด)</label>
@@ -351,11 +418,17 @@
         </div>
         <div class="filter-field">
           <label>รอบข้อมูล</label>
-          <select id="p-period"><option value="">ทั้งหมด (สะสมทุกรอบ)</option></select>
+          <div class="ms-wrap" id="p-period-wrap">
+            <button type="button" class="ms-toggle" id="p-period-toggle">ทั้งหมด</button>
+            <div class="ms-panel" id="p-period-panel"></div>
+          </div>
         </div>
         <div class="filter-field">
           <label>สถานะระบบ</label>
-          <select id="p-status"><option value="">ทั้งหมด</option></select>
+          <div class="ms-wrap" id="p-status-wrap">
+            <button type="button" class="ms-toggle" id="p-status-toggle">ทั้งหมด</button>
+            <div class="ms-panel" id="p-status-panel"></div>
+          </div>
         </div>
         <button class="reset-btn" id="p-reset">ล้างตัวกรอง</button>
       </div>
@@ -516,16 +589,94 @@ function periodBadge(s) {
 function uniqueSorted(arr, key) {
   return [...new Set(arr.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== ''))].sort((a,b)=>String(a).localeCompare(String(b),'th'));
 }
-function populateSelect(sel, values, keepValue) {
-  const current = keepValue !== undefined ? keepValue : sel.value;
-  sel.innerHTML = sel.querySelector('option[value=""]') ? sel.querySelector('option[value=""]').outerHTML : '<option value="">ทั้งหมด</option>';
-  values.forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v; opt.textContent = v;
-    sel.appendChild(opt);
+
+// ---------- generic multi-select dropdown-checklist ----------
+// Each filter has a Set() of selected values (empty Set = "ทั้งหมด" / no filter).
+// `optionLabels` optionally maps a raw value -> a nicer display label (used
+// for "รอบข้อมูล" where the underlying value is a batchId but we show its label).
+const msState = {};   // id -> Set of selected values
+const msBound = {};   // id -> true once click listeners are attached
+
+function msInit(id, onChange) {
+  if (msBound[id]) return;
+  msBound[id] = true;
+  msState[id] = new Set();
+  const toggle = document.getElementById(id + '-toggle');
+  const panel = document.getElementById(id + '-panel');
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.ms-panel.open').forEach(p => { if (p !== panel) p.classList.remove('open'); });
+    panel.classList.toggle('open');
   });
-  if (current && values.includes(current)) sel.value = current;
+  document.addEventListener('click', (e) => {
+    if (panel.classList.contains('open') && !panel.contains(e.target) && e.target !== toggle) {
+      panel.classList.remove('open');
+    }
+  });
+  msState[id]._onChange = onChange;
 }
+
+function msPopulate(id, values, optionLabels) {
+  const toggle = document.getElementById(id + '-toggle');
+  const panel = document.getElementById(id + '-panel');
+  const selected = msState[id];
+  // drop selections that no longer exist in the (possibly refreshed) value list
+  [...selected].forEach(v => { if (!values.includes(v)) selected.delete(v); });
+
+  if (!values.length) {
+    panel.innerHTML = '<div class="empty-state" style="padding:10px; font-size:12px;">ไม่มีตัวเลือก</div>';
+  } else {
+    panel.innerHTML = values.map(v => {
+      const label = (optionLabels && optionLabels[v]) || v;
+      const checked = selected.has(v) ? 'checked' : '';
+      return `<label class="ms-option"><input type="checkbox" data-val="${String(v).replace(/"/g,'&quot;')}" ${checked}><span>${label}</span></label>`;
+    }).join('') + `<div class="ms-actions"><button type="button" class="ms-clear">ล้างช่องนี้</button></div>`;
+
+    panel.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const val = cb.dataset.val;
+        if (cb.checked) selected.add(val); else selected.delete(val);
+        msUpdateToggleLabel(id, optionLabels);
+        if (selected._onChange) selected._onChange();
+      });
+    });
+    panel.querySelector('.ms-clear').addEventListener('click', () => {
+      selected.clear();
+      panel.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+      msUpdateToggleLabel(id, optionLabels);
+      if (selected._onChange) selected._onChange();
+    });
+  }
+  msUpdateToggleLabel(id, optionLabels);
+}
+
+function msUpdateToggleLabel(id, optionLabels) {
+  const toggle = document.getElementById(id + '-toggle');
+  const selected = msState[id];
+  if (!selected || selected.size === 0) {
+    toggle.textContent = 'ทั้งหมด';
+    toggle.classList.remove('active-filter');
+  } else if (selected.size === 1) {
+    const v = [...selected][0];
+    toggle.textContent = (optionLabels && optionLabels[v]) || v;
+    toggle.classList.add('active-filter');
+  } else {
+    toggle.textContent = `เลือก ${selected.size} รายการ`;
+    toggle.classList.add('active-filter');
+  }
+}
+
+function msClear(id) {
+  if (!msState[id]) return;
+  msState[id].clear();
+  const panel = document.getElementById(id + '-panel');
+  panel.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+  msUpdateToggleLabel(id);
+}
+
+function msHasFilter(id) { return msState[id] && msState[id].size > 0; }
+function msMatches(id, value) { return !msState[id] || msState[id].size === 0 || msState[id].has(String(value)); }
+
 
 // =================================================================
 // GOOGLE FORM + PUBLISHED-CSV STORAGE LAYER (no login required)
@@ -978,34 +1129,125 @@ function sortRows(rows, key, dir) {
 let aucState = { sortKey: 'มูลค่าคงค้าง', sortDir: 'desc', page: 1, pageSize: 25 };
 
 function dedupeByJobNumber(rows) {
+  // Keep the MOST RECENTLY UPLOADED record for any job number that appears
+  // more than once across files. This matters for recurring yearly uploads:
+  // a job that's still open may be re-exported in a later file with an
+  // updated status/value, and that newer snapshot should win over an older
+  // one, not the other way around. Rows are assumed to be in upload order
+  // (oldest batch first), so simply letting later entries overwrite earlier
+  // ones in the Map achieves "keep latest."
   const seen = new Map();
   rows.forEach(r => {
     const key = r['หมายเลขงาน'];
     if (key === undefined || key === null || key === '') { seen.set(Symbol(), r); return; }
-    if (!seen.has(key)) seen.set(key, r);
+    seen.set(key, r);
   });
   return Array.from(seen.values());
 }
 
+// ---------- derived "ประเภทงบ" (C / I / P / หมู่บ้าน), read per-row so it
+// never depends on how the uploader labelled the whole file ----------
+function deriveBudgetCategory(row) {
+  if (row['ประเภทงาน AUC'] === 'บ้านจัดสรร') return 'หมู่บ้าน';
+  const jobNo = String(row['หมายเลขงาน'] || '');
+  const m = jobNo.match(/^([A-Za-z]+)-/);
+  if (m) {
+    const p = m[1].toUpperCase();
+    if (p === 'C' || p === 'I' || p === 'P') return p;
+  }
+  return 'อื่นๆ';
+}
+
+// ---------- derived "ปีงบ" group: ปีปัจจุบัน vs ปีก่อนปัจจุบัน, computed
+// against today's real Buddhist-calendar year so it never goes stale ----------
+function currentBEYear() { return new Date().getFullYear() + 543; }
+function deriveYearGroup(row) {
+  const text = row['wbs_year'] ?? row['wbsYear'] ?? '';
+  const matches = String(text).match(/25\d{2}/g);
+  if (!matches || !matches.length) return 'ไม่ระบุปี';
+  const repYear = Math.max(...matches.map(Number));
+  const cur = currentBEYear();
+  if (repYear === cur) return `ปีปัจจุบัน (${cur})`;
+  if (repYear > cur) return `ปีอนาคต (${repYear})`;
+  return `ปีก่อนปัจจุบัน (${repYear} และก่อนหน้า)`;
+}
+
+// ---------- grading scale: % of jobs closed (CLSD) vs total ----------
+const GRADE_SCALE = [
+  { min: 78, grade: 'A++', pass: true  },
+  { min: 74, grade: 'A+',  pass: false },
+  { min: 70, grade: 'A',   pass: false },
+  { min: 65, grade: 'B+',  pass: false },
+  { min: 60, grade: 'B',   pass: false },
+  { min: 55, grade: 'C+',  pass: false },
+  { min: 50, grade: 'C',   pass: false },
+  { min: 45, grade: 'D+',  pass: false },
+  { min: 0,  grade: 'D',   pass: false },
+];
+function gradeFor(pct) {
+  for (const g of GRADE_SCALE) { if (pct >= g.min) return g; }
+  return GRADE_SCALE[GRADE_SCALE.length - 1];
+}
+function gradeBadgeClass(grade) {
+  if (grade.startsWith('A')) return 'badge-CLSD';
+  if (grade.startsWith('B')) return 'badge-default';
+  if (grade.startsWith('C')) return 'badge-REL';
+  return 'badge-TECO';
+}
+function renderGradingPanel() {
+  const el = document.getElementById('grading-tbody');
+  if (!el) return;
+  const rows = dedupeByJobNumber(AUC_DATA);
+  const groups = {};
+  rows.forEach(r => {
+    const cat = deriveBudgetCategory(r);
+    if (!groups[cat]) groups[cat] = { total: 0, closed: 0 };
+    groups[cat].total++;
+    if (r['สถานะระบบ'] === 'CLSD') groups[cat].closed++;
+  });
+  const overallTotal = rows.length;
+  const overallClosed = rows.filter(r => r['สถานะระบบ'] === 'CLSD').length;
+
+  const order = ['C', 'I', 'P', 'หมู่บ้าน', 'อื่นๆ'];
+  const catRows = order.filter(c => groups[c]).map(cat => {
+    const g = groups[cat];
+    const pct = g.total ? (g.closed / g.total * 100) : 0;
+    return { label: 'งาน ' + cat, total: g.total, closed: g.closed, pct, grade: gradeFor(pct) };
+  });
+  const overallPct = overallTotal ? (overallClosed / overallTotal * 100) : 0;
+  const allRows = [
+    { label: 'ภาพรวมทั้งหมด', total: overallTotal, closed: overallClosed, pct: overallPct, grade: gradeFor(overallPct), isOverall: true },
+    ...catRows
+  ];
+
+  el.innerHTML = allRows.map(r => `
+    <tr${r.isOverall ? ' style="font-weight:600; background: var(--steel-light);"' : ''}>
+      <td>${r.label}</td>
+      <td class="num">${fmtNum(r.total)}</td>
+      <td class="num">${fmtNum(r.closed)}</td>
+      <td class="num">${r.pct.toFixed(1)}%</td>
+      <td><span class="badge ${gradeBadgeClass(r.grade.grade)}">${r.grade.grade}</span></td>
+      <td>${r.grade.pass ? '<span class="badge badge-CLSD">ผ่าน</span>' : '<span class="badge badge-TECO">ยังไม่ผ่าน</span>'}</td>
+    </tr>`).join('');
+}
+
 function aucFiltered() {
   const search = document.getElementById('f-search').value.trim().toLowerCase();
-  const period = document.getElementById('f-period').value;
-  const budget = document.getElementById('f-budget').value;
-  const year = document.getElementById('f-year').value;
-  const status = document.getElementById('f-status').value;
-  const tech = document.getElementById('f-tech').value;
 
-  // When viewing "all periods" combined, the same job can legitimately appear
-  // in more than one uploaded file (e.g. a superseding file that re-exports
-  // overlapping jobs). Dedupe by job number so totals aren't inflated.
-  // Viewing one specific period shows that file's data in full, untouched.
-  const base = period ? AUC_DATA.filter(r => r['__batchId'] === period) : dedupeByJobNumber(AUC_DATA);
+  // When viewing "all periods" combined (no period selected), the same job can
+  // legitimately appear in more than one uploaded file (e.g. a superseding
+  // file that re-exports overlapping jobs). Dedupe by job number so totals
+  // aren't inflated. Selecting one or more specific periods shows those
+  // files' data in full, untouched (useful for comparing raw files directly).
+  const base = msHasFilter('f-period')
+    ? AUC_DATA.filter(r => msMatches('f-period', r['__batchId']))
+    : dedupeByJobNumber(AUC_DATA);
 
   return base.filter(r => {
-    if (budget && r['budgetType'] !== budget && r['budget_type'] !== budget) return false;
-    if (year && r['wbsYear'] !== year && r['wbs_year'] !== year) return false;
-    if (status && r['สถานะระบบ'] !== status) return false;
-    if (tech && r['ช่างผู้คมงาน'] !== tech) return false;
+    if (!msMatches('f-budget', deriveBudgetCategory(r))) return false;
+    if (!msMatches('f-year', deriveYearGroup(r))) return false;
+    if (!msMatches('f-status', r['สถานะระบบ'])) return false;
+    if (!msMatches('f-tech', r['ช่างผู้คมงาน'])) return false;
     if (search) {
       const hay = (String(r['หมายเลขงาน']||'') + ' ' + String(r['คำอธิบายของสินทรัพย์']||'')).toLowerCase();
       if (!hay.includes(search)) return false;
@@ -1047,7 +1289,7 @@ function renderAucCharts(rows) {
   });
 
   const budgetCounts = {};
-  rows.forEach(r => { const b = r['budget_type']||'ไม่ระบุ'; budgetCounts[b] = (budgetCounts[b]||0)+1; });
+  rows.forEach(r => { const b = deriveBudgetCategory(r); budgetCounts[b] = (budgetCounts[b]||0)+1; });
   renderChart('chart-budget', {
     type: 'doughnut',
     data: { labels: Object.keys(budgetCounts), datasets: [{ data: Object.values(budgetCounts), backgroundColor: [palette.steel, palette.amber, palette.teal, palette.slate] }] },
@@ -1069,6 +1311,7 @@ function renderAucTable() {
   document.getElementById('auc-count-label').textContent = `แสดง ${rows.length} งาน จากทั้งหมด ${dedupeByJobNumber(AUC_DATA).length} งาน (ไม่นับซ้ำ)`;
   renderAucKpis(rows);
   renderAucCharts(rows);
+  renderGradingPanel();
 
   rows = sortRows(rows, aucState.sortKey, aucState.sortDir);
   const totalPages = Math.max(1, Math.ceil(rows.length / aucState.pageSize));
@@ -1091,8 +1334,8 @@ function renderAucTable() {
         <td class="num">${fmtPct(r['% เบิกค่าใช้จ่าย'])}</td>
         <td>${r['ช่างผู้คมงาน']||'-'}</td>
         <td>${r['ประเภทงาน AUC']||'-'}</td>
-        <td>${r['budget_type']||'-'}</td>
-        <td>${r['wbs_year']||'-'}</td>
+        <td>${deriveBudgetCategory(r)}</td>
+        <td>${deriveYearGroup(r)}</td>
         <td>${periodBadge(r['__batchLabel'])}</td>
       </tr>`).join('');
   }
@@ -1113,28 +1356,34 @@ function renderAucTable() {
 }
 
 function initAucFilters() {
-  populateSelect(document.getElementById('f-period'), allBatchMeta.filter(m=>m.type==='auc').map(m=>m.id).length ? allBatchMeta.filter(m=>m.type==='auc').map(m=>m.id) : []);
-  // use label as display but id as value: rebuild manually
-  const periodSel = document.getElementById('f-period');
-  const keepPeriod = periodSel.value;
-  periodSel.innerHTML = '<option value="">ทั้งหมด (สะสมทุกรอบ)</option>';
-  allBatchMeta.filter(m=>m.type==='auc').forEach(m => {
-    const opt = document.createElement('option'); opt.value = m.id; opt.textContent = m.label || m.id;
-    periodSel.appendChild(opt);
-  });
-  if (keepPeriod) periodSel.value = keepPeriod;
+  const aucBatches = allBatchMeta.filter(m => m.type === 'auc');
+  const periodLabels = {};
+  aucBatches.forEach(m => { periodLabels[m.id] = m.label || m.id; });
 
-  populateSelect(document.getElementById('f-budget'), uniqueSorted(AUC_DATA, 'budget_type'));
-  populateSelect(document.getElementById('f-year'), uniqueSorted(AUC_DATA, 'wbs_year'));
-  populateSelect(document.getElementById('f-status'), uniqueSorted(AUC_DATA, 'สถานะระบบ'));
-  populateSelect(document.getElementById('f-tech'), uniqueSorted(AUC_DATA, 'ช่างผู้คมงาน'));
+  msInit('f-period', () => { aucState.page = 1; renderAucTable(); });
+  msInit('f-budget', () => { aucState.page = 1; renderAucTable(); });
+  msInit('f-year', () => { aucState.page = 1; renderAucTable(); });
+  msInit('f-status', () => { aucState.page = 1; renderAucTable(); });
+  msInit('f-tech', () => { aucState.page = 1; renderAucTable(); });
+
+  msPopulate('f-period', aucBatches.map(m => m.id), periodLabels);
+  const budgetOrder = ['C', 'I', 'P', 'หมู่บ้าน', 'อื่นๆ'];
+  const budgetPresent = new Set(AUC_DATA.map(deriveBudgetCategory));
+  msPopulate('f-budget', budgetOrder.filter(v => budgetPresent.has(v)));
+  const yearPresent = [...new Set(AUC_DATA.map(deriveYearGroup))].sort((a,b)=>{
+    // "ปีปัจจุบัน" first, then "ปีอนาคต", then "ปีก่อนปัจจุบัน", then unknown
+    const rank = v => v.startsWith('ปีปัจจุบัน') ? 0 : v.startsWith('ปีอนาคต') ? 1 : v.startsWith('ปีก่อนปัจจุบัน') ? 2 : 3;
+    return rank(a) - rank(b);
+  });
+  msPopulate('f-year', yearPresent);
+  msPopulate('f-status', uniqueSorted(AUC_DATA, 'สถานะระบบ'));
+  msPopulate('f-tech', uniqueSorted(AUC_DATA, 'ช่างผู้คมงาน'));
 
   if (!initAucFilters._bound) {
-    ['f-search','f-period','f-budget','f-year','f-status','f-tech'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => { aucState.page = 1; renderAucTable(); });
-    });
+    document.getElementById('f-search').addEventListener('input', () => { aucState.page = 1; renderAucTable(); });
     document.getElementById('f-reset').addEventListener('click', () => {
-      ['f-search','f-period','f-budget','f-year','f-status','f-tech'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-search').value = '';
+      ['f-period','f-budget','f-year','f-status','f-tech'].forEach(id => msClear(id));
       aucState.page = 1; renderAucTable();
     });
     document.querySelectorAll('#auc-table thead th').forEach(th => {
@@ -1157,11 +1406,11 @@ let profitState = { sortKey: 'กำไรจริง', sortDir: 'desc', page: 
 
 function profitFiltered() {
   const search = document.getElementById('p-search').value.trim().toLowerCase();
-  const period = document.getElementById('p-period').value;
-  const status = document.getElementById('p-status').value;
-  const base = period ? PROFIT_DATA.filter(r => r['__batchId'] === period) : dedupeByJobNumber(PROFIT_DATA);
+  const base = msHasFilter('p-period')
+    ? PROFIT_DATA.filter(r => msMatches('p-period', r['__batchId']))
+    : dedupeByJobNumber(PROFIT_DATA);
   return base.filter(r => {
-    if (status && r['สถานะระบบ'] !== status) return false;
+    if (!msMatches('p-status', r['สถานะระบบ'])) return false;
     if (search) {
       const hay = (String(r['หมายเลขงาน']||'') + ' ' + String(r['คำอธิบาย']||'')).toLowerCase();
       if (!hay.includes(search)) return false;
@@ -1260,23 +1509,21 @@ function renderProfitTable() {
 }
 
 function initProfitFilters() {
-  const periodSel = document.getElementById('p-period');
-  const keepPeriod = periodSel.value;
-  periodSel.innerHTML = '<option value="">ทั้งหมด (สะสมทุกรอบ)</option>';
-  allBatchMeta.filter(m=>m.type==='profit').forEach(m => {
-    const opt = document.createElement('option'); opt.value = m.id; opt.textContent = m.label || m.id;
-    periodSel.appendChild(opt);
-  });
-  if (keepPeriod) periodSel.value = keepPeriod;
+  const profitBatches = allBatchMeta.filter(m => m.type === 'profit');
+  const periodLabels = {};
+  profitBatches.forEach(m => { periodLabels[m.id] = m.label || m.id; });
 
-  populateSelect(document.getElementById('p-status'), uniqueSorted(PROFIT_DATA, 'สถานะระบบ'));
+  msInit('p-period', () => { profitState.page = 1; renderProfitTable(); });
+  msInit('p-status', () => { profitState.page = 1; renderProfitTable(); });
+
+  msPopulate('p-period', profitBatches.map(m => m.id), periodLabels);
+  msPopulate('p-status', uniqueSorted(PROFIT_DATA, 'สถานะระบบ'));
 
   if (!initProfitFilters._bound) {
-    ['p-search','p-period','p-status'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => { profitState.page = 1; renderProfitTable(); });
-    });
+    document.getElementById('p-search').addEventListener('input', () => { profitState.page = 1; renderProfitTable(); });
     document.getElementById('p-reset').addEventListener('click', () => {
-      ['p-search','p-period','p-status'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('p-search').value = '';
+      ['p-period','p-status'].forEach(id => msClear(id));
       profitState.page = 1; renderProfitTable();
     });
     document.querySelectorAll('#profit-table thead th').forEach(th => {
