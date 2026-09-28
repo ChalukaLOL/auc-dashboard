@@ -115,7 +115,9 @@
   .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 20px; }
   .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
   .kpi-card .label { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
-  .kpi-card .value { font-size: 24px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; color: var(--text); }
+  .kpi-card .value { font-size: 24px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; color: var(--text); display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+  .kpi-card .value .grade-chip { font-family: 'IBM Plex Sans Thai', sans-serif; font-size: 15px; padding: 3px 11px; }
+  .kpi-card .value .pass-chip { font-family: 'IBM Plex Sans Thai', sans-serif; font-size: 12px; padding: 3px 10px; }
   .kpi-card .sub { font-size: 11.5px; color: var(--text-dim); margin-top: 4px; }
   .kpi-card.accent-steel { border-top: 3px solid var(--steel); }
   .kpi-card.accent-teal { border-top: 3px solid var(--teal); }
@@ -275,28 +277,6 @@
 
     <div class="kpi-row" id="auc-kpis"></div>
 
-    <div class="panel">
-      <h2>เกณฑ์ประเมินผลงาน (% ปิดงานสำเร็จ) <span class="hint">เกณฑ์ผ่าน: A++ (≥78% ปิดงาน) · คำนวณจากข้อมูลรวมทุกรอบ ไม่นับซ้ำ</span></h2>
-      <div class="table-wrap">
-        <table id="grading-table">
-          <thead>
-            <tr>
-              <th>ประเภท</th>
-              <th class="num">งานทั้งหมด</th>
-              <th class="num">ปิดแล้ว (CLSD)</th>
-              <th class="num">% ปิดงาน</th>
-              <th>เกรด</th>
-              <th>ผลประเมิน</th>
-            </tr>
-          </thead>
-          <tbody id="grading-tbody"></tbody>
-        </table>
-      </div>
-      <div class="note">
-        เกรดคำนวณจาก % ของงานที่มีสถานะ "CLSD" (ปิดงานแล้ว) เทียบกับงานทั้งหมดในหมวดนั้น: A++ ≥78% (ผ่าน) · A+ ≥74% · A ≥70% · B+ ≥65% · B ≥60% · C+ ≥55% · C ≥50% · D+ ≥45% · D &lt;45% — เกณฑ์นี้เป็นค่าเริ่มต้นที่ตั้งไว้ให้ แก้ไขได้หากหน่วยงานมีเกณฑ์ทางการที่ต่างจากนี้
-      </div>
-    </div>
-
     <div class="charts-row">
       <div class="panel">
         <h2>จำนวนงานตามสถานะระบบ</h2>
@@ -384,7 +364,7 @@
       </div>
       <div class="pager" id="auc-pager"></div>
       <div class="note">
-        คอลัมน์ "เหตุผล" และ "ผู้รับผิดชอบ" ถูกตัดออกเนื่องจากไม่มีข้อมูลหรือมีค่าเดียวซ้ำทุกแถวในไฟล์ต้นฉบับ · "รอบข้อมูล" คือชื่อไฟล์/ป้ายกำกับที่อัปโหลดเข้ามาแต่ละครั้ง เลือกดูย้อนหลังได้จากตัวกรองด้านบน · เมื่อดู "ทั้งหมด (สะสมทุกรอบ)" ระบบจะไม่นับงานที่มีเลขงานซ้ำกันข้ามไฟล์สองครั้ง (นับครั้งเดียว) แต่ถ้าเลือกดูรอบข้อมูลใดรอบหนึ่งโดยเฉพาะ จะเห็นข้อมูลเต็มของไฟล์นั้นตามจริง
+        คอลัมน์ "เหตุผล" และ "ผู้รับผิดชอบ" ถูกตัดออกเนื่องจากไม่มีข้อมูลหรือมีค่าเดียวซ้ำทุกแถวในไฟล์ต้นฉบับ · "รอบข้อมูล" คือชื่อไฟล์/ป้ายกำกับที่อัปโหลดเข้ามาแต่ละครั้ง เลือกดูย้อนหลังได้จากตัวกรองด้านบน · เมื่อดู "ทั้งหมด (สะสมทุกรอบ)" ระบบจะไม่นับงานที่มีเลขงานซ้ำกันข้ามไฟล์สองครั้ง (นับครั้งเดียว) แต่ถ้าเลือกดูรอบข้อมูลใดรอบหนึ่งโดยเฉพาะ จะเห็นข้อมูลเต็มของไฟล์นั้นตามจริง · งานหมู่บ้านนับรวมในภาพรวมแค่ครั้งเดียว (ไม่ซ้ำกับไฟล์ C) เมื่อกรอง "ประเภทงบ" = หมู่บ้าน จะเห็นงานของไฟล์หมู่บ้านครบทุกงาน ส่วนกรอง C จะไม่เห็นงานหมู่บ้าน
       </div>
     </div>
   </section>
@@ -676,6 +656,7 @@ function msClear(id) {
 
 function msHasFilter(id) { return msState[id] && msState[id].size > 0; }
 function msMatches(id, value) { return !msState[id] || msState[id].size === 0 || msState[id].has(String(value)); }
+function msMatchesAny(id, values) { return !msState[id] || msState[id].size === 0 || values.some(v => msState[id].has(String(v))); }
 
 
 // =================================================================
@@ -748,7 +729,8 @@ function loadFromSeedOnly() {
   AUC_DATA = [];
   PROFIT_DATA = [];
   SEED_BATCHES.forEach(b => {
-    const tagged = b.rows.map(r => ({...r, __batchId: b.batchId, __batchLabel: b.label, budget_type: r['budget_type'] || b.budgetType || null, wbs_year: r['wbs_year'] || b.wbsYear || null}));
+    const village = isVillageBatch(b);
+    const tagged = b.rows.map(r => ({...r, __batchId: b.batchId, __batchLabel: b.label, budget_type: r['budget_type'] || b.budgetType || null, wbs_year: r['wbs_year'] || b.wbsYear || null, __villageBatch: village}));
     if (b.type === 'auc') AUC_DATA.push(...tagged);
     else if (b.type === 'profit') PROFIT_DATA.push(...tagged);
   });
@@ -817,7 +799,8 @@ async function loadAllFromCsv() {
   const meta = [];
   Object.values(groups).forEach(g => {
     const b = g.meta;
-    const tagged = g.rows.map(r => ({...r, __batchId: b.batchId, __batchLabel: b.label, budget_type: b.budgetType || null, wbs_year: b.wbsYear || null}));
+    const village = isVillageBatch(b);
+    const tagged = g.rows.map(r => ({...r, __batchId: b.batchId, __batchLabel: b.label, budget_type: b.budgetType || null, wbs_year: b.wbsYear || null, __villageBatch: village}));
     if (b.type === 'auc') aucRows.push(...tagged);
     else if (b.type === 'profit') profitRows.push(...tagged);
     meta.push({ id: b.batchId, type: b.type, label: b.label, uploadedAt: b.uploadedAt, uploadedBy: b.uploadedBy, rowCount: g.rows.length });
@@ -1128,34 +1111,48 @@ function sortRows(rows, key, dir) {
 // =================================================================
 let aucState = { sortKey: 'มูลค่าคงค้าง', sortDir: 'desc', page: 1, pageSize: 25 };
 
+// A row belongs to the "หมู่บ้าน" (village) group if it came from a village
+// file, or is itself a บ้านจัดสรร job. Village jobs are ALSO ordinary C jobs
+// (same job numbers as in the C file), so they get both categories.
+function isVillageBatch(b) {
+  const hay = String(b.label || '') + ' ' + String(b.sourceFileName || '');
+  return /หมู่บ้าน/.test(hay) || /บ้านจัดสรร/.test(String(b.aucType || ''));
+}
+function isVillageRow(r) {
+  return !!(r.__inVillage || r.__villageBatch || r['ประเภทงาน AUC'] === 'บ้านจัดสรร');
+}
+
 function dedupeByJobNumber(rows) {
   // Keep the MOST RECENTLY UPLOADED record for any job number that appears
-  // more than once across files. This matters for recurring yearly uploads:
-  // a job that's still open may be re-exported in a later file with an
-  // updated status/value, and that newer snapshot should win over an older
-  // one, not the other way around. Rows are assumed to be in upload order
-  // (oldest batch first), so simply letting later entries overwrite earlier
-  // ones in the Map achieves "keep latest."
+  // more than once across files, so a newer snapshot of a still-open job wins
+  // over an older one. Rows are in upload order (oldest batch first), so
+  // letting later entries overwrite earlier ones achieves "keep latest".
+  // The village flag is merged across all copies of the job, so a job that
+  // appears in both the C file and the village file is counted ONCE in totals
+  // but can still be found under both categories when filtering.
   const seen = new Map();
   rows.forEach(r => {
     const key = r['หมายเลขงาน'];
-    if (key === undefined || key === null || key === '') { seen.set(Symbol(), r); return; }
-    seen.set(key, r);
+    if (key === undefined || key === null || key === '') { seen.set(Symbol(), { ...r, __inVillage: isVillageRow(r) }); return; }
+    const prev = seen.get(key);
+    seen.set(key, { ...r, __inVillage: isVillageRow(r) || (prev ? isVillageRow(prev) : false) });
   });
   return Array.from(seen.values());
 }
 
-// ---------- derived "ประเภทงบ" (C / I / P / หมู่บ้าน), read per-row so it
-// never depends on how the uploader labelled the whole file ----------
-function deriveBudgetCategory(row) {
-  if (row['ประเภทงาน AUC'] === 'บ้านจัดสรร') return 'หมู่บ้าน';
-  const jobNo = String(row['หมายเลขงาน'] || '');
-  const m = jobNo.match(/^([A-Za-z]+)-/);
-  if (m) {
-    const p = m[1].toUpperCase();
-    if (p === 'C' || p === 'I' || p === 'P') return p;
-  }
-  return 'อื่นๆ';
+// ---------- derived "ประเภทงบ": C / I / P from the job-number prefix.
+// Jobs from a village file are their OWN category (หมู่บ้าน) and are kept
+// out of C, so filtering C never shows village jobs. ----------
+function rowBudgetCategories(row) {
+  if (isVillageRow(row)) return ['หมู่บ้าน'];
+  const m = String(row['หมายเลขงาน'] || '').match(/^([A-Za-z]+)-/);
+  const p = m ? m[1].toUpperCase() : '';
+  return [(p === 'C' || p === 'I' || p === 'P') ? p : 'อื่นๆ'];
+}
+// single category per row (used where rows must partition, e.g. the pie chart)
+function primaryBudgetCategory(row) {
+  const cats = rowBudgetCategories(row);
+  return cats.includes('หมู่บ้าน') ? 'หมู่บ้าน' : cats[0];
 }
 
 // ---------- derived "ปีงบ" group: ปีปัจจุบัน vs ปีก่อนปัจจุบัน, computed
@@ -1172,7 +1169,7 @@ function deriveYearGroup(row) {
   return `ปีก่อนปัจจุบัน (${repYear} และก่อนหน้า)`;
 }
 
-// ---------- grading scale: % of jobs closed (CLSD) vs total ----------
+// ---------- grade from the average material-disbursement % ----------
 const GRADE_SCALE = [
   { min: 78, grade: 'A++', pass: true  },
   { min: 74, grade: 'A+',  pass: false },
@@ -1194,42 +1191,6 @@ function gradeBadgeClass(grade) {
   if (grade.startsWith('C')) return 'badge-REL';
   return 'badge-TECO';
 }
-function renderGradingPanel() {
-  const el = document.getElementById('grading-tbody');
-  if (!el) return;
-  const rows = dedupeByJobNumber(AUC_DATA);
-  const groups = {};
-  rows.forEach(r => {
-    const cat = deriveBudgetCategory(r);
-    if (!groups[cat]) groups[cat] = { total: 0, closed: 0 };
-    groups[cat].total++;
-    if (r['สถานะระบบ'] === 'CLSD') groups[cat].closed++;
-  });
-  const overallTotal = rows.length;
-  const overallClosed = rows.filter(r => r['สถานะระบบ'] === 'CLSD').length;
-
-  const order = ['C', 'I', 'P', 'หมู่บ้าน', 'อื่นๆ'];
-  const catRows = order.filter(c => groups[c]).map(cat => {
-    const g = groups[cat];
-    const pct = g.total ? (g.closed / g.total * 100) : 0;
-    return { label: 'งาน ' + cat, total: g.total, closed: g.closed, pct, grade: gradeFor(pct) };
-  });
-  const overallPct = overallTotal ? (overallClosed / overallTotal * 100) : 0;
-  const allRows = [
-    { label: 'ภาพรวมทั้งหมด', total: overallTotal, closed: overallClosed, pct: overallPct, grade: gradeFor(overallPct), isOverall: true },
-    ...catRows
-  ];
-
-  el.innerHTML = allRows.map(r => `
-    <tr${r.isOverall ? ' style="font-weight:600; background: var(--steel-light);"' : ''}>
-      <td>${r.label}</td>
-      <td class="num">${fmtNum(r.total)}</td>
-      <td class="num">${fmtNum(r.closed)}</td>
-      <td class="num">${r.pct.toFixed(1)}%</td>
-      <td><span class="badge ${gradeBadgeClass(r.grade.grade)}">${r.grade.grade}</span></td>
-      <td>${r.grade.pass ? '<span class="badge badge-CLSD">ผ่าน</span>' : '<span class="badge badge-TECO">ยังไม่ผ่าน</span>'}</td>
-    </tr>`).join('');
-}
 
 function aucFiltered() {
   const search = document.getElementById('f-search').value.trim().toLowerCase();
@@ -1244,7 +1205,7 @@ function aucFiltered() {
     : dedupeByJobNumber(AUC_DATA);
 
   return base.filter(r => {
-    if (!msMatches('f-budget', deriveBudgetCategory(r))) return false;
+    if (!msMatchesAny('f-budget', rowBudgetCategories(r))) return false;
     if (!msMatches('f-year', deriveYearGroup(r))) return false;
     if (!msMatches('f-status', r['สถานะระบบ'])) return false;
     if (!msMatches('f-tech', r['ช่างผู้คมงาน'])) return false;
@@ -1253,7 +1214,7 @@ function aucFiltered() {
       if (!hay.includes(search)) return false;
     }
     return true;
-  }).map(r => ({...r, budget_type: r['budget_type'] ?? r['budgetType'], wbs_year: r['wbs_year'] ?? r['wbsYear']}));
+  }).map(r => ({...r, budget_type: rowBudgetCategories(r).join(' + '), wbs_year: deriveYearGroup(r)}));
 }
 
 function renderAucKpis(rows) {
@@ -1264,17 +1225,26 @@ function renderAucKpis(rows) {
   const closed = rows.filter(r=>r['สถานะระบบ']==='CLSD').length;
   const open = total - closed;
 
+  // grade from the average material-disbursement %, following the current filters
+  let gradeChips = '', gradeSub = 'เฉลี่ยจากงานที่แสดงอยู่';
+  if (rows.length) {
+    const g = gradeFor(avgMaterial);
+    gradeChips = `<span class="badge grade-chip ${gradeBadgeClass(g.grade)}">เกรด ${g.grade}</span>` +
+      (g.pass ? '<span class="badge pass-chip badge-CLSD">ผ่าน</span>' : '<span class="badge pass-chip badge-TECO">ยังไม่ผ่าน</span>');
+    gradeSub = 'เฉลี่ยจากงานที่แสดงอยู่ · เกณฑ์ผ่าน A++ (≥78%)';
+  }
+
   const kpis = [
     {label:'จำนวนงานทั้งหมด', value: fmtNum(total), sub: `กรองจากทั้งหมด ${dedupeByJobNumber(AUC_DATA).length} งาน (ไม่นับซ้ำ)`, accent:'steel'},
     {label:'มูลค่าคงค้างรวม (บาท)', value: fmtNum(outstanding), sub:'งานที่ยังไม่ปิดบัญชี', accent:'amber'},
     {label:'มูลค่าโอนปิดรวม (บาท)', value: fmtNum(transferred), sub:'งานที่โอนปิดแล้ว', accent:'teal'},
-    {label:'% เบิกจ่ายวัสดุเฉลี่ย', value: fmtPct(avgMaterial), sub:'เฉลี่ยจากงานที่แสดงอยู่', accent:'steel'},
+    {label:'% เบิกจ่ายวัสดุเฉลี่ย', value: fmtPct(avgMaterial), chips: gradeChips, sub: gradeSub, accent:'steel'},
     {label:'ปิดงานแล้ว (CLSD)', value: fmtNum(closed), sub:`เปิดอยู่/อื่นๆ ${open} งาน`, accent:'teal'},
   ];
   document.getElementById('auc-kpis').innerHTML = kpis.map(k => `
     <div class="kpi-card accent-${k.accent}">
       <div class="label">${k.label}</div>
-      <div class="value">${k.value}</div>
+      <div class="value">${k.value}${k.chips || ''}</div>
       <div class="sub">${k.sub}</div>
     </div>`).join('');
 }
@@ -1289,7 +1259,7 @@ function renderAucCharts(rows) {
   });
 
   const budgetCounts = {};
-  rows.forEach(r => { const b = deriveBudgetCategory(r); budgetCounts[b] = (budgetCounts[b]||0)+1; });
+  rows.forEach(r => { const b = primaryBudgetCategory(r); budgetCounts[b] = (budgetCounts[b]||0)+1; });
   renderChart('chart-budget', {
     type: 'doughnut',
     data: { labels: Object.keys(budgetCounts), datasets: [{ data: Object.values(budgetCounts), backgroundColor: [palette.steel, palette.amber, palette.teal, palette.slate] }] },
@@ -1311,7 +1281,6 @@ function renderAucTable() {
   document.getElementById('auc-count-label').textContent = `แสดง ${rows.length} งาน จากทั้งหมด ${dedupeByJobNumber(AUC_DATA).length} งาน (ไม่นับซ้ำ)`;
   renderAucKpis(rows);
   renderAucCharts(rows);
-  renderGradingPanel();
 
   rows = sortRows(rows, aucState.sortKey, aucState.sortDir);
   const totalPages = Math.max(1, Math.ceil(rows.length / aucState.pageSize));
@@ -1334,7 +1303,7 @@ function renderAucTable() {
         <td class="num">${fmtPct(r['% เบิกค่าใช้จ่าย'])}</td>
         <td>${r['ช่างผู้คมงาน']||'-'}</td>
         <td>${r['ประเภทงาน AUC']||'-'}</td>
-        <td>${deriveBudgetCategory(r)}</td>
+        <td>${rowBudgetCategories(r).join(' + ')}</td>
         <td>${deriveYearGroup(r)}</td>
         <td>${periodBadge(r['__batchLabel'])}</td>
       </tr>`).join('');
@@ -1368,7 +1337,7 @@ function initAucFilters() {
 
   msPopulate('f-period', aucBatches.map(m => m.id), periodLabels);
   const budgetOrder = ['C', 'I', 'P', 'หมู่บ้าน', 'อื่นๆ'];
-  const budgetPresent = new Set(AUC_DATA.map(deriveBudgetCategory));
+  const budgetPresent = new Set(AUC_DATA.flatMap(rowBudgetCategories));
   msPopulate('f-budget', budgetOrder.filter(v => budgetPresent.has(v)));
   const yearPresent = [...new Set(AUC_DATA.map(deriveYearGroup))].sort((a,b)=>{
     // "ปีปัจจุบัน" first, then "ปีอนาคต", then "ปีก่อนปัจจุบัน", then unknown
