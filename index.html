@@ -277,6 +277,32 @@
 
     <div class="kpi-row" id="auc-kpis"></div>
 
+    <div class="panel">
+      <h2>เกณฑ์ตัดเกรดตามแผนปฏิบัติ สายงาน กต <span class="hint">เกณฑ์ผ่าน: A++ · % คำนวณจากมูลค่า (โอนปิด ÷ (คงค้าง+โอนปิด)) · คำนวณจากข้อมูลรวมทุกรอบ ไม่นับซ้ำ</span></h2>
+      <div class="form-row" style="max-width:220px; margin-bottom:12px;">
+        <label>ประเมินผลของเดือน</label>
+        <select id="official-grade-month"></select>
+      </div>
+      <div class="table-wrap">
+        <table id="official-grade-table-auc">
+          <thead>
+            <tr>
+              <th>หมวดงาน (ตามเกณฑ์ทางการ)</th>
+              <th class="num">จำนวนงาน</th>
+              <th class="num">% มูลค่าที่ปิด</th>
+              <th>เกรด</th>
+              <th>ผลประเมิน</th>
+              <th>ต้องการอีกเพื่อผ่าน</th>
+            </tr>
+          </thead>
+          <tbody id="official-grade-tbody-auc"></tbody>
+        </table>
+      </div>
+      <div class="note">
+        แยกหมวดงานใหม่ (2.1/2.2) กับงานค้าง (1.1/1.2/1.3) โดยดูปีของ "วันเริ่มดำเนินการ" ของแต่ละงาน: งานที่เริ่มในปีปัจจุบันถือเป็นงานใหม่ งานที่เริ่มในปี 2568 เข้าเกณฑ์ 1.3 ส่วนที่เริ่มก่อนหน้านั้นเข้าเกณฑ์ 1.2 (สำหรับงบ I/P) — งานหมวด "หมู่บ้าน" (AUC) ไม่อยู่ในเกณฑ์ชุดนี้ (ตารางนี้ครอบคลุมเฉพาะ C/I/P); งานกลุ่มบ้านจัดสรรประเมินแยกในแท็บกำไร/ต้นทุน (ตาราง 5) · คอลัมน์ "ต้องการอีกเพื่อผ่าน" เป็นค่าประมาณจากมูลค่าเฉลี่ยของงานที่ยังเปิดอยู่ในหมวดนั้น (เพราะเกณฑ์ตัดเกรดคิดจากมูลค่า ไม่ใช่จำนวนงาน) จำนวนจริงอาจต่างไปขึ้นกับว่าปิดงานไหนก่อน
+      </div>
+    </div>
+
     <div class="charts-row">
       <div class="panel">
         <h2>จำนวนงานตามสถานะระบบ</h2>
@@ -377,6 +403,28 @@
     </div>
 
     <div class="kpi-row" id="profit-kpis"></div>
+
+    <div class="panel">
+      <h2>เกณฑ์ตัดเกรดตามแผนปฏิบัติ สายงาน กต <span class="hint">เกณฑ์ผ่าน: A++ · % คำนวณจากต้นทุนจริง (ปิดแล้ว ÷ ทั้งหมด) เดือนเดียวกับแท็บงาน AUC</span></h2>
+      <div class="table-wrap">
+        <table id="official-grade-table-profit">
+          <thead>
+            <tr>
+              <th>หมวดงาน (ตามเกณฑ์ทางการ)</th>
+              <th class="num">จำนวนงาน</th>
+              <th class="num">% มูลค่าที่ปิด</th>
+              <th>เกรด</th>
+              <th>ผลประเมิน</th>
+              <th>ต้องการอีกเพื่อผ่าน</th>
+            </tr>
+          </thead>
+          <tbody id="official-grade-tbody-profit"></tbody>
+        </table>
+      </div>
+      <div class="note">
+        ตาราง 4 ครอบคลุมงาน C02.2 ทั้งหมดที่ไม่ใช่บ้านจัดสรร · ตาราง 5 ครอบคลุมเฉพาะงานกลุ่มบ้านจัดสรรที่ "% พัสดุ" หรือ "% ค่าใช้จ่าย" ปัจจุบัน ≥80% (เกณฑ์ทางการระบุให้เช็ค ณ วันที่ 1 มี.ค. 2569 โดยเฉพาะ แต่ข้อมูลที่มีเป็นค่าล่าสุดเท่านั้น จึงเป็นค่าประมาณ ไม่ใช่ค่า ณ วันที่ดังกล่าวจริง) · ข้อมูลไม่มีคอลัมน์มูลค่าคงค้าง/โอนปิดแบบแท็บ AUC จึงใช้ "ต้นทุนจริง" แทนในการคำนวณ % แก้ไขเดือนที่ประเมินได้จากแท็บงาน AUC (ใช้เดือนเดียวกัน)
+      </div>
+    </div>
 
     <div class="charts-row">
       <div class="panel">
@@ -736,6 +784,7 @@ function loadFromSeedOnly() {
   allBatchMeta = SEED_BATCHES.map(b => ({id:b.batchId, type:b.type, label:b.label, uploadedAt:b.uploadedAt, uploadedBy:b.uploadedBy, rowCount:b.rows.length}));
   initAucFilters(); renderAucTable();
   initProfitFilters(); renderProfitTable();
+  renderOfficialGrading();
   renderBatchList();
 }
 
@@ -770,7 +819,7 @@ async function loadAllFromCsv() {
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const text = await res.text();
   const rows = parseCsv(text);
-  if (!rows.length) { AUC_DATA = []; PROFIT_DATA = []; allBatchMeta = []; setSyncLabel(true); initAucFilters(); renderAucTable(); initProfitFilters(); renderProfitTable(); renderBatchList(); return; }
+  if (!rows.length) { AUC_DATA = []; PROFIT_DATA = []; allBatchMeta = []; setSyncLabel(true); initAucFilters(); renderAucTable(); initProfitFilters(); renderProfitTable(); renderOfficialGrading(); renderBatchList(); return; }
 
   const headers = rows[0];
   const dataColIdx = headers.findIndex(h => h.trim().toLowerCase() === 'data');
@@ -810,6 +859,7 @@ async function loadAllFromCsv() {
   setSyncLabel(true);
   initAucFilters(); renderAucTable();
   initProfitFilters(); renderProfitTable();
+  renderOfficialGrading();
   renderBatchList();
 }
 
@@ -1152,15 +1202,18 @@ function primaryBudgetCategory(row) {
 // against today's real Buddhist-calendar year so it never goes stale ----------
 function currentBEYear() { return new Date().getFullYear() + 543; }
 function deriveYearGroup(row) {
-  const text = row['wbs_year'] ?? row['wbsYear'] ?? '';
-  const matches = String(text).match(/25\d{2}/g);
-  if (!matches || !matches.length) return 'ไม่ระบุปี';
-  const repYear = Math.max(...matches.map(Number));
+  // Uses each job's own "วันเริ่มดำเนินการ" start date — the SAME basis the
+  // official grading panel uses — rather than the whole file's label text,
+  // so counts here match the grading panel exactly (a file like IP_68.xlsx
+  // can bundle "ก่อนปี 2568 หรือ ปี 2568" jobs together; only the per-row
+  // start date can tell them apart).
+  const y = jobStartBEYear(row);
+  if (y === null) return 'ไม่ระบุปี';
   const cur = currentBEYear();
-  if (repYear === cur) return `ปีปัจจุบัน (${cur})`;
-  if (repYear > cur) return `ปีอนาคต (${repYear})`;
-  if (repYear === cur - 1) return `ปีก่อนปัจจุบัน (${repYear})`;
-  return `ปีอื่นๆก่อนปีปัจจุบัน (${repYear} และก่อนหน้า)`;
+  if (y === cur) return `ปีปัจจุบัน (${cur})`;
+  if (y > cur) return `ปีอนาคต (${y})`;
+  if (y === cur - 1) return `ปีก่อนปัจจุบัน (${y})`;
+  return `ปีอื่นๆก่อนปีปัจจุบัน (${y} และก่อนหน้า)`;
 }
 
 // ---------- grade from the average material-disbursement % ----------
@@ -1184,6 +1237,223 @@ function gradeBadgeClass(grade) {
   if (grade.startsWith('B')) return 'badge-default';
   if (grade.startsWith('C')) return 'badge-REL';
   return 'badge-TECO';
+}
+
+// =================================================================
+// OFFICIAL MONTHLY GRADING CRITERIA (ตามแผนปฏิบัติ สายงาน กต)
+// Transcribed from the criteria sheet provided. Thresholds are
+// cumulative % targets per month; December has no "D" threshold
+// (anything below the December "C" mark simply fails to reach C).
+// NOTE: this table hardcodes "2568"/"2569" exactly as printed in the
+// official document — it is this fiscal year's criteria, not a
+// perpetually-shifting formula, and will need updating by hand once
+// a new year's criteria sheet is issued.
+// =================================================================
+const THAI_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+const GRADE_TABLES = {
+  '1.1': { title: '1.1 งบผู้ใช้ไฟ (C) ไม่รวมงาน C02.2 (งานค้าง ก่อนปีปัจจุบัน)', months: {
+    'ม.ค.':[0,2,4,6,8,10], 'ก.พ.':[8,10,12,14,16,18], 'มี.ค.':[17,19,21,23,25,27],
+    'เม.ย.':[25,27,29,31,33,35], 'พ.ค.':[33,35,37,39,41,43], 'มิ.ย.':[42,44,46,48,50,52],
+    'ก.ค.':[50,52,54,56,58,60], 'ส.ค.':[58,60,62,64,66,68], 'ก.ย.':[67,69,71,73,75,77],
+    'ต.ค.':[75,77,79,81,83,85], 'พ.ย.':[83,85,87,89,91,93], 'ธ.ค.':[80,85,90,95,100]
+  }},
+  '1.2': { title: '1.2 งบลงทุน (I) และงบโครงการ (P) — งานคงค้างที่เกิดก่อนปี 2568', months: {
+    'เม.ย.':[14,17,20,23,26,29], 'พ.ค.':[21,24,27,30,33,36], 'มิ.ย.':[38,41,44,47,50,53],
+    'ก.ค.':[35,38,41,44,47,50], 'ส.ค.':[42,45,48,51,54,57], 'ก.ย.':[58,61,64,67,70,73],
+    'ต.ค.':[55,58,61,64,67,70], 'พ.ย.':[62,65,68,71,74,77], 'ธ.ค.':[70,75,80,85,90,95]
+  }},
+  '1.3': { title: '1.3 งบลงทุน (I) และงบโครงการ (P) — งานคงค้างที่เกิดในปี 2568', months: {
+    'เม.ย.':[18,20,22,24,26,28], 'พ.ค.':[25,27,29,31,33,35], 'มิ.ย.':[32,34,36,38,40,42],
+    'ก.ค.':[39,41,43,45,47,49], 'ส.ค.':[46,48,50,52,54,56], 'ก.ย.':[52,54,56,58,60,62],
+    'ต.ค.':[59,61,63,65,67,69], 'พ.ย.':[66,68,70,72,74,76], 'ธ.ค.':[60,65,70,75,80,85]
+  }},
+  '2.1': { title: '2.1 งบผู้ใช้ไฟ (C) ไม่รวม C02.2 — งานก่อสร้างใหม่ในปีปัจจุบัน (ไตรมาส 1-2)', months: {
+    'เม.ย.':[2,4,6,8,10,12], 'พ.ค.':[7,9,11,13,15,17], 'มิ.ย.':[12,14,16,18,20,22],
+    'ก.ค.':[20,22,24,26,28,30], 'ส.ค.':[28,30,32,34,36,38], 'ก.ย.':[37,39,41,43,45,47],
+    'ต.ค.':[45,47,49,51,53,55], 'พ.ย.':[53,55,57,59,61,63], 'ธ.ค.':[50,55,60,65,70,75]
+  }},
+  '2.2': { title: '2.2 งบลงทุน (I) และงบโครงการ (P) — งานก่อสร้างใหม่ในปีปัจจุบัน (ไตรมาส 1-2)', months: {
+    'เม.ย.':[-5,-3,-1,1,3,5], 'พ.ค.':[-2,0,2,4,6,8], 'มิ.ย.':[2,4,6,8,10,12],
+    'ก.ค.':[9,11,13,15,17,19], 'ส.ค.':[16,18,20,22,24,26], 'ก.ย.':[22,24,26,28,30,32],
+    'ต.ค.':[29,31,33,35,37,39], 'พ.ย.':[38,40,42,44,46,48], 'ธ.ค.':[30,35,40,45,50,55]
+  }},
+  '4': { title: '4. งานก่อสร้างงบผู้ใช้ไฟ ทรัพย์สินผู้ใช้ไฟ (C02.2) ไม่รวมบ้านจัดสรร (ไตรมาส 1-2)', reuse: '1.1' },
+  '5': { title: '5. งานกลุ่มบ้านและที่ดินจัดสรร (ที่มี % เบิกวัสดุ หรือ % เบิกค่าใช้จ่าย ≥80% ณ 1 มี.ค. 2569)', reuse: '2.2' },
+};
+GRADE_TABLES['4'].months = GRADE_TABLES['1.1'].months;
+GRADE_TABLES['5'].months = GRADE_TABLES['2.2'].months;
+
+function gradeThresholdRow(tableKey, monthIdx) {
+  const table = GRADE_TABLES[tableKey];
+  if (!table) return null;
+  const baseRow = table.months[THAI_MONTHS[monthIdx]];
+  if (!baseRow) return null;
+  // A++ is an extra grade one point above A+ — the new passing mark.
+  // Capped at 100 so a perfect score still reaches A++ (some months' A+
+  // mark is already 100, which would otherwise make A++ unreachable).
+  const row = [...baseRow, Math.min(baseRow[baseRow.length - 1] + 1, 100)];
+  const labels = baseRow.length === 6 ? ['D','C','B','B+','A','A+','A++'] : ['C','B','B+','A','A+','A++'];
+  return { row, labels };
+}
+
+function gradeFromTable(tableKey, monthIdx, pct) {
+  const rl = gradeThresholdRow(tableKey, monthIdx);
+  if (!rl) return { grade: 'ไม่มีเกณฑ์เดือนนี้', pass: false, noCriteria: true };
+  const { row, labels } = rl;
+  if (pct < row[0]) return { grade: 'ต่ำกว่า ' + labels[0], pass: false };
+  let grade = labels[0];
+  for (let i = 0; i < row.length; i++) { if (pct >= row[i]) grade = labels[i]; }
+  return { grade, pass: grade === 'A++' };
+}
+
+// Rough estimate of how many more jobs need to close to reach the A++ (pass)
+// mark, assuming the remaining open jobs in the group close at their average
+// value. This is necessarily an approximation since the % is value-based,
+// not job-count-based — the actual number needed depends on which specific
+// jobs close.
+function estimateJobsToPass(g, tableKey, monthIdx) {
+  const rl = gradeThresholdRow(tableKey, monthIdx);
+  if (!rl) return null;
+  const targetPct = rl.row[rl.row.length - 1];
+  const openCount = g.count - g.closedCount;
+  if (openCount <= 0) return null;
+  const requiredClosedValue = g.totalValue * targetPct / 100;
+  const gap = requiredClosedValue - g.closedValue;
+  if (gap <= 0) return 0;
+  const openValue = g.totalValue - g.closedValue;
+  if (openValue <= 0) return null;
+  const avgOpenJobValue = openValue / openCount;
+  if (avgOpenJobValue <= 0) return null;
+  return Math.min(openCount, Math.ceil(gap / avgOpenJobValue));
+}
+
+function gradeBadgeClassOfficial(grade) {
+  if (grade === 'A++' || grade === 'A+' || grade === 'A') return 'badge-CLSD';
+  if (grade === 'B+' || grade === 'B') return 'badge-default';
+  if (grade === 'C') return 'badge-REL';
+  return 'badge-TECO';
+}
+
+// ---- classify which table a row belongs to ----
+function jobStartBEYear(row) {
+  const d = row['วันเริ่มดำเนินการ'];
+  if (!d) return null;
+  const y = parseInt(String(d).slice(0, 4), 10);
+  if (!y || isNaN(y)) return null;
+  return y + 543;
+}
+
+function aucGradeTableKey(row) {
+  const cur = currentBEYear();
+  const cats = rowBudgetCategories(row);
+  const startY = jobStartBEYear(row);
+  const isNew = startY === cur;
+  if (cats.includes('C')) return isNew ? '2.1' : '1.1';
+  if (cats.includes('I') || cats.includes('P')) {
+    if (isNew) return '2.2';
+    if (startY === 2568) return '1.3';
+    return '1.2';
+  }
+  return null; // หมู่บ้าน (AUC-side) isn't covered by this criteria sheet
+}
+
+function profitIsVillage(row) { return row['ประเภทงาน C02.2'] === 'บ้านจัดสรร'; }
+function profitGradeTableKey(row) {
+  if (profitIsVillage(row)) {
+    const mat = Number(row['% พัสดุ']) || 0;
+    const exp = Number(row['% ค่าใช้จ่าย']) || 0;
+    // Table 5's eligibility is a one-time snapshot taken 1 Mar 2569; we only
+    // have each job's CURRENT %, so this is an approximation using current
+    // values, not the true historical snapshot.
+    return (mat >= 0.8 || exp >= 0.8) ? '5' : null;
+  }
+  return '4';
+}
+
+function renderGradingTable(tbodyId, groups, monthIdx) {
+  const el = document.getElementById(tbodyId);
+  if (!el) return;
+  const order = ['1.1','2.1','1.2','1.3','2.2','4','5'];
+  const rowsHtml = order.filter(k => groups[k]).map(k => {
+    const g = groups[k];
+    const pct = g.totalValue ? (g.closedValue / g.totalValue * 100) : 0;
+    const gr = gradeFromTable(k, monthIdx, pct);
+    let needCell = '-';
+    if (!gr.pass && !gr.noCriteria) {
+      const need = estimateJobsToPass(g, k, monthIdx);
+      if (need === null) needCell = 'ประมาณไม่ได้';
+      else if (need === 0) needCell = 'เกือบถึงแล้ว (<1 งาน)';
+      else needCell = `~${fmtNum(need)} งาน`;
+    }
+    return `<tr>
+      <td>${GRADE_TABLES[k].title}</td>
+      <td class="num">${fmtNum(g.count)}</td>
+      <td class="num">${pct.toFixed(1)}%</td>
+      <td><span class="badge ${gradeBadgeClassOfficial(gr.grade)}">${gr.grade}</span></td>
+      <td>${gr.pass ? '<span class="badge badge-CLSD">ผ่าน</span>' : (gr.noCriteria ? '-' : '<span class="badge badge-TECO">ยังไม่ผ่าน</span>')}</td>
+      <td>${needCell}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = rowsHtml || '<tr><td colspan="6"><div class="empty-state">ไม่มีงานที่เข้าเกณฑ์กลุ่มใดเลย</div></td></tr>';
+}
+
+let officialGradeMonthIdx = new Date().getMonth(); // 0 = ม.ค. ... 11 = ธ.ค., defaults to current month
+
+function computeAucGradeGroups() {
+  const rows = dedupeByJobNumber(AUC_DATA);
+  const groups = {};
+  rows.forEach(r => {
+    const key = aucGradeTableKey(r);
+    if (!key) return;
+    if (!groups[key]) groups[key] = { count: 0, closedCount: 0, closedValue: 0, totalValue: 0 };
+    const outstanding = Number(r['มูลค่าคงค้าง']) || 0;
+    const transferred = Number(r['มูลค่าโอนปิด']) || 0;
+    groups[key].count++;
+    if (r['สถานะระบบ'] === 'CLSD') groups[key].closedCount++;
+    groups[key].closedValue += transferred;
+    groups[key].totalValue += outstanding + transferred;
+  });
+  return groups;
+}
+
+function computeProfitGradeGroups() {
+  const rows = dedupeByJobNumber(PROFIT_DATA);
+  const groups = {};
+  rows.forEach(r => {
+    const key = profitGradeTableKey(r);
+    if (!key) return;
+    if (!groups[key]) groups[key] = { count: 0, closedCount: 0, closedValue: 0, totalValue: 0 };
+    // Profit-tab rows have no มูลค่าคงค้าง/มูลค่าโอนปิด columns, so ต้นทุนจริง
+    // (actual cost) is used as the value basis instead: closed-job cost vs
+    // total cost of all jobs in the group.
+    const cost = Number(r['ต้นทุนจริง']) || 0;
+    groups[key].count++;
+    groups[key].totalValue += cost;
+    if (r['สถานะระบบ'] === 'CLSD') { groups[key].closedCount++; groups[key].closedValue += cost; }
+  });
+  return groups;
+}
+
+function renderOfficialGrading() {
+  renderGradingTable('official-grade-tbody-auc', computeAucGradeGroups(), officialGradeMonthIdx);
+  renderGradingTable('official-grade-tbody-profit', computeProfitGradeGroups(), officialGradeMonthIdx);
+}
+
+function initOfficialGradeMonthSelect() {
+  const sel = document.getElementById('official-grade-month');
+  if (!sel || sel.dataset.bound) return;
+  sel.dataset.bound = '1';
+  THAI_MONTHS.forEach((m, i) => {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = m;
+    if (i === officialGradeMonthIdx) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => {
+    officialGradeMonthIdx = Number(sel.value);
+    renderOfficialGrading();
+  });
 }
 
 function aucFiltered() {
@@ -1225,17 +1495,19 @@ function renderAucKpis(rows) {
   const closed = rows.filter(r=>r['สถานะระบบ']==='CLSD').length;
   const open = total - closed;
 
-  // % completion by job count, and % completion by value — each gets its own grade.
+  // % completion by job count, and % completion by value (plain figures —
+  // grading now lives only in the official grading panel below, since that's
+  // the one broken down correctly by category and month).
   const pctByCount = total ? (closed / total * 100) : 0;
   const totalValue = outstanding + transferred;
   const pctByValue = totalValue ? (transferred / totalValue * 100) : 0;
 
   const kpis = [
     {label:'จำนวนงานทั้งหมด', value: fmtNum(total), sub: `กรองจากทั้งหมด ${dedupeByJobNumber(AUC_DATA).length} งาน (ไม่นับซ้ำ)`, accent:'steel'},
-    {label:'ปิดงานแล้ว (CLSD)', value: fmtNum(closed), chips: total ? gradeChipsHtml(pctByCount) : '', sub: `${fmtPct(pctByCount)} ของงานทั้งหมด (${open} งานยังเปิดอยู่) · เกณฑ์ผ่าน A++ (≥78%)`, accent:'teal'},
+    {label:'ปิดงานแล้ว (CLSD)', value: fmtNum(closed), sub: `${fmtPct(pctByCount)} ของงานทั้งหมด (${open} งานยังเปิดอยู่)`, accent:'teal'},
     {label:'มูลค่าคงค้างรวม (บาท)', value: fmtNum(outstanding), sub:'งานที่ยังไม่ปิดบัญชี', accent:'amber'},
-    {label:'มูลค่าโอนปิดรวม (บาท)', value: fmtNum(transferred), chips: totalValue ? gradeChipsHtml(pctByValue) : '', sub: `${fmtPct(pctByValue)} ของมูลค่ารวม (คงค้าง+โอนปิด) · เกณฑ์ผ่าน A++ (≥78%)`, accent:'teal'},
-    {label:'% เบิกจ่ายวัสดุเฉลี่ย', value: fmtPct(avgMaterial), sub:'เฉลี่ยจากงานที่แสดงอยู่ (ไม่ใช้ตัดเกรด)', accent:'steel'},
+    {label:'มูลค่าโอนปิดรวม (บาท)', value: fmtNum(transferred), sub: `${fmtPct(pctByValue)} ของมูลค่ารวม (คงค้าง+โอนปิด)`, accent:'teal'},
+    {label:'% เบิกจ่ายวัสดุเฉลี่ย', value: fmtPct(avgMaterial), sub:'เฉลี่ยจากงานที่แสดงอยู่', accent:'steel'},
   ];
   document.getElementById('auc-kpis').innerHTML = kpis.map(k => `
     <div class="kpi-card accent-${k.accent}">
@@ -1522,6 +1794,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 // =================================================================
 initUploadUI();
 initSettingsUI();
+initOfficialGradeMonthSelect();
 initApi();
 </script>
 </body>
