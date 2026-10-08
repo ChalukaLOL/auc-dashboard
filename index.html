@@ -847,7 +847,9 @@ async function loadAllFromCsv() {
   const meta = [];
   Object.values(groups).forEach(g => {
     const b = g.meta;
-    const tagged = g.rows.map(r => ({...r, __batchId: b.batchId, __batchLabel: b.label, budget_type: b.budgetType || null, wbs_year: b.wbsYear || null}));
+    // older uploads (no dateFix flag) may have dates shifted one day early — repair them
+    const fixedRows = b.dateFix ? g.rows : repairShiftedDates(g.rows);
+    const tagged = fixedRows.map(r => ({...r, __batchId: b.batchId, __batchLabel: b.label, budget_type: b.budgetType || null, wbs_year: b.wbsYear || null}));
     if (b.type === 'auc') aucRows.push(...tagged);
     else if (b.type === 'profit') profitRows.push(...tagged);
     meta.push({ id: b.batchId, type: b.type, label: b.label, uploadedAt: b.uploadedAt, uploadedBy: b.uploadedBy, rowCount: g.rows.length });
@@ -913,7 +915,7 @@ async function createRemoteBatch(batch) {
       action: 'upload', batchId, chunkIndex: i, chunkCount: chunks.length,
       type: batch.type, label: batch.label, sourceFileName: batch.sourceFileName,
       budgetType: batch.budgetType, wbsYear: batch.wbsYear, aucType: batch.aucType,
-      uploadedAt: batch.uploadedAt, uploadedBy: batch.uploadedBy,
+      uploadedAt: batch.uploadedAt, uploadedBy: batch.uploadedBy, dateFix: 2,
       rows: chunks[i]
     };
     await submitFormRecord(record);
@@ -980,12 +982,50 @@ function shortenOrg(s) {
   if (s === null || s === undefined || s === '') return null;
   return String(s).split('/')[0];
 }
+// Dates are read as raw Excel serial numbers and converted with SheetJS's
+// timezone-free SSF helper. (Letting SheetJS build JS Date objects instead
+// shifts every date back by one day for browsers set to Thailand's timezone —
+// e.g. 2026-01-01 became 2025-12-31 23:59:56 — which silently moved jobs into
+// the wrong year.)
 function excelDateToStr(v) {
-  if (v instanceof Date) {
-    const y = v.getFullYear(), m = String(v.getMonth()+1).padStart(2,'0'), d = String(v.getDate()).padStart(2,'0');
-    return `${y}-${m}-${d}`;
+  if (typeof v === 'number') {
+    const p = XLSX.SSF.parse_date_code(v);
+    if (p && p.y > 1900) {
+      return `${p.y}-${String(p.m).padStart(2,'0')}-${String(p.d).padStart(2,'0')}`;
+    }
+    return null;
+  }
+  if (v instanceof Date) { // fallback only; not expected now
+    const t = new Date(v.getTime() + 60 * 1000);
+    return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
   }
   return v ?? null;
+}
+
+// Repair for batches uploaded BEFORE the fix above. Those have every date one
+// day early, which makes most start dates land on the last day of a month
+// (a real start date almost never does). If most dated rows in a batch do,
+// shift the whole batch forward one day. Batches saved after the fix carry
+// dateFix=2 and are never touched.
+function isLastDayOfMonth(str) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(str || ''));
+  if (!m) return false;
+  const lastDay = new Date(Date.UTC(+m[1], +m[2], 0)).getUTCDate();
+  return +m[3] === lastDay;
+}
+function addOneDay(str) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(str || ''));
+  if (!m) return str;
+  const t = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + 1));
+  return `${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2,'0')}-${String(t.getUTCDate()).padStart(2,'0')}`;
+}
+function repairShiftedDates(rows) {
+  const dated = rows.filter(r => /^\d{4}-\d{2}-\d{2}$/.test(String(r['วันเริ่มดำเนินการ'] || '')));
+  if (!dated.length) return rows;
+  const monthEnds = dated.filter(r => isLastDayOfMonth(r['วันเริ่มดำเนินการ'])).length;
+  if (monthEnds / dated.length < 0.5) return rows;
+  return rows.map(r => /^\d{4}-\d{2}-\d{2}$/.test(String(r['วันเริ่มดำเนินการ'] || ''))
+    ? { ...r, 'วันเริ่มดำเนินการ': addOneDay(r['วันเริ่มดำเนินการ']) } : r);
 }
 function parseFilterText(text) {
   const out = {};
@@ -1002,7 +1042,7 @@ function handleFile(file) {
   reader.onload = (e) => {
     try {
       const data = new Uint8Array(e.target.result);
-      const wb = XLSX.read(data, {type:'array', cellDates:true});
+      const wb = XLSX.read(data, {type:'array'});
       const ws = wb.Sheets[wb.SheetNames[0]];
       const aoa = XLSX.utils.sheet_to_json(ws, {header:1, defval:null});
       if (!aoa.length) throw new Error('ไฟล์ว่างเปล่า');
