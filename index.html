@@ -15,7 +15,7 @@
     --ink-soft: #253449;
     --slate: #4A5A70;
     --steel: #2F6690;
-    --steel-light: #16283A;
+    --steel-light: #E8F0F6;
     --amber: #C97A1A;
     --amber-bg: #FBEEDD;
     --teal: #1F7A63;
@@ -26,8 +26,14 @@
     --surface: #FFFFFF;
     --border: #DCE1E7;
     --text: #16202E;
-    --text-dim: #5B6B7E;
+    --text-dim: #44546A;
     --header-fg: #F3F6F9;
+    --th-bg: #DCE9F5; --th-fg: #14233A;
+    --fg-link: #1E5079;
+    --b-teal-bg: #E4F3EE;  --b-teal-fg: #0F5C48;
+    --b-amber-bg: #FBEEDD; --b-amber-fg: #8A4F08;
+    --b-red-bg: #FBE9E5;   --b-red-fg: #9B2B18;
+    --b-steel-bg: #E8F0F6; --b-steel-fg: #1E5079;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -35,7 +41,13 @@
       --surface: #141D2C;
       --border: #263248;
       --text: #E7ECF3;
-      --text-dim: #8C9BB3;
+      --text-dim: #B8C5D9;
+      --th-bg: #1E3A57; --th-fg: #EAF1F9;
+      --fg-link: #8CC4F5;
+      --b-teal-bg: #0F3B2D;  --b-teal-fg: #6BF0C2;
+      --b-amber-bg: #4A3210; --b-amber-fg: #FFC873;
+      --b-red-bg: #4A1D16;   --b-red-fg: #FFA392;
+      --b-steel-bg: #1E3A57; --b-steel-fg: #A9D4FF;
       --steel-light: #16283A;
       --amber-bg: #2E2010;
       --teal-bg: #10261F;
@@ -46,10 +58,16 @@
   }
   :root[data-theme="dark"] {
     --bg: #0B1220;
-    --surface: #16283A;
-    --border: #16283A;
+    --surface: #141D2C;
+    --border: #263248;
     --text: #E7ECF3;
-    --text-dim: #8C9BB3;
+    --text-dim: #B8C5D9;
+    --th-bg: #1E3A57; --th-fg: #EAF1F9;
+    --fg-link: #8CC4F5;
+    --b-teal-bg: #0F3B2D;  --b-teal-fg: #6BF0C2;
+    --b-amber-bg: #4A3210; --b-amber-fg: #FFC873;
+    --b-red-bg: #4A1D16;   --b-red-fg: #FFA392;
+    --b-steel-bg: #1E3A57; --b-steel-fg: #A9D4FF;
     --steel-light: #16283A;
     --amber-bg: #2E2010;
     --teal-bg: #10261F;
@@ -95,7 +113,7 @@
   .tab-btn .dot { width:7px; height:7px; border-radius:50%; background:var(--amber); display:none; }
   .tab-btn .dot.show { display:inline-block; }
 
-  main { max-width: 1280px; margin: 0 auto; padding: 24px 28px 60px; }
+  main { max-width: 1440px; margin: 0 auto; padding: 24px 28px 60px; }
   .view { display: none; }
   .view.active { display: block; }
 
@@ -110,7 +128,7 @@
     background: var(--surface); border: 1px solid var(--border); color: var(--text);
     border-radius: 6px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-family: inherit;
   }
-  .refresh-btn:hover { border-color: var(--steel); color: var(--steel); }
+  .refresh-btn:hover { border-color: var(--steel); color: var(--fg-link); }
 
   .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 20px; }
   .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
@@ -159,7 +177,7 @@
     content: '▾'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
     color: var(--text-dim); font-size: 11px;
   }
-  .ms-toggle.active-filter { border-color: var(--steel); color: var(--steel); font-weight: 600; }
+  .ms-toggle.active-filter { border-color: var(--fg-link); color: var(--fg-link); font-weight: 600; }
   .ms-panel {
     display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%;
     max-width: 320px; max-height: 260px; overflow-y: auto; background: var(--surface);
@@ -174,7 +192,7 @@
   .ms-option:hover { background: var(--steel-light); }
   .ms-option input { accent-color: var(--steel); cursor: pointer; }
   .ms-actions { display: flex; justify-content: flex-end; padding: 4px 6px 2px; border-top: 1px dashed var(--border); margin-top: 4px; }
-  .ms-clear { background: none; border: none; color: var(--steel); font-size: 11.5px; cursor: pointer; font-family: inherit; padding: 2px 4px; }
+  .ms-clear { background: none; border: none; color: var(--fg-link); font-size: 11.5px; cursor: pointer; font-family: inherit; padding: 2px 4px; }
   .ms-clear:hover { text-decoration: underline; }
 
   .table-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12.5px; color: var(--text-dim); flex-wrap:wrap; gap:8px; }
@@ -182,23 +200,31 @@
   .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
   table { width: 100%; border-collapse: collapse; font-size: 12.5px; white-space: nowrap; }
   thead th {
-    background: var(--steel-light); color: var(--ink-soft); text-align: left; padding: 9px 12px;
+    background: var(--th-bg); color: var(--th-fg); text-align: left; padding: 9px 12px;
     font-weight: 600; position: sticky; top: 0; cursor: pointer; user-select: none; border-bottom: 1px solid var(--border);
   }
-  thead th:hover { color: var(--steel); }
+  thead th:hover { color: var(--fg-link); }
   thead th .arrow { font-size: 10px; margin-left: 3px; opacity: 0.6; }
   tbody td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
   tbody tr:hover { background: var(--steel-light); }
   tbody tr:last-child td { border-bottom: none; }
   td.num, th.num { text-align: right; font-family: 'IBM Plex Mono', monospace; }
-  td.job-code { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--steel); }
+  td.job-code { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--fg-link); }
 
+  .grade-table { font-size: 12px; }
+  .grade-table th { white-space: normal; min-width: 76px; padding: 8px 7px; line-height: 1.3; vertical-align: bottom; }
+  .grade-table td { padding: 7px 8px; }
+  .grade-table th:first-child { min-width: 210px; }
+  .grade-table td:first-child { white-space: normal; min-width: 210px; }
+  .grade-table .need-val { color: var(--b-amber-fg); font-weight: 600; }
+  .grade-table td.num b { color: var(--text); }
+  .grade-table .sub-th { display: block; font-weight: 400; font-size: 10.5px; opacity: .85; }
   .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-  .badge-CLSD { background: var(--teal-bg); color: var(--teal); }
-  .badge-REL { background: var(--amber-bg); color: var(--amber); }
-  .badge-TECO { background: var(--red-bg); color: var(--red); }
-  .badge-default { background: var(--steel-light); color: var(--steel); }
-  .badge-period { background: var(--steel-light); color: var(--steel); font-weight: 500; }
+  .badge-CLSD { background: var(--b-teal-bg); color: var(--b-teal-fg); }
+  .badge-REL { background: var(--b-amber-bg); color: var(--b-amber-fg); }
+  .badge-TECO { background: var(--b-red-bg); color: var(--b-red-fg); }
+  .badge-default { background: var(--b-steel-bg); color: var(--b-steel-fg); }
+  .badge-period { background: var(--b-steel-bg); color: var(--b-steel-fg); font-weight: 500; }
 
   .pager { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-top: 10px; font-size: 12.5px; color: var(--text-dim); }
   .pager button { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; cursor: pointer; font-family: inherit; color: var(--text); }
@@ -216,7 +242,7 @@
     text-align: center; color: var(--text-dim); font-size: 13px; cursor: pointer;
     background: var(--bg); transition: border-color .15s, color .15s;
   }
-  .dropzone:hover, .dropzone.dragover { border-color: var(--steel); color: var(--steel); }
+  .dropzone:hover, .dropzone.dragover { border-color: var(--steel); color: var(--fg-link); }
   .dropzone input { display: none; }
   .form-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
   .form-row label { font-size: 12px; color: var(--text-dim); }
@@ -227,12 +253,12 @@
   }
   .primary-btn:hover { background: #285879; }
   .primary-btn:disabled { opacity: 0.5; cursor: default; }
-  .danger-link { color: var(--red); font-size: 12px; cursor: pointer; background:none; border:none; font-family:inherit; padding:0; }
+  .danger-link { color: var(--b-red-fg); font-size: 12px; cursor: pointer; background:none; border:none; font-family:inherit; padding:0; }
   .danger-link:hover { text-decoration: underline; }
   .msg-box { border-radius: 8px; padding: 10px 14px; font-size: 12.5px; margin-top: 10px; }
-  .msg-box.ok { background: var(--teal-bg); color: var(--teal); }
-  .msg-box.err { background: var(--red-bg); color: var(--red); }
-  .msg-box.info { background: var(--steel-light); color: var(--steel); }
+  .msg-box.ok { background: var(--teal-bg); color: var(--b-teal-fg); }
+  .msg-box.err { background: var(--red-bg); color: var(--b-red-fg); }
+  .msg-box.info { background: var(--steel-light); color: var(--fg-link); }
   .preview-table { font-size: 11.5px; max-height: 220px; overflow: auto; border: 1px solid var(--border); border-radius: 6px; }
   .preview-table table { font-size: 11px; }
 
@@ -244,7 +270,7 @@
   }
   .batch-row .meta { font-size: 12px; color: var(--text-dim); }
   .batch-row .name { font-weight: 600; font-size: 13px; color: var(--text); }
-  .disabled-note { background: var(--amber-bg); color: var(--amber); padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+  .disabled-note { background: var(--amber-bg); color: var(--b-amber-fg); padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
 </style>
 </head>
 <body>
@@ -284,23 +310,27 @@
         <select id="official-grade-month"></select>
       </div>
       <div class="table-wrap">
-        <table id="official-grade-table-auc">
+        <table id="official-grade-table-auc" class="grade-table">
           <thead>
             <tr>
               <th>หมวดงาน (ตามเกณฑ์ทางการ)</th>
               <th class="num">จำนวนงาน</th>
               <th class="num">จำนวนการปิดงาน</th>
-              <th class="num">% มูลค่าที่ปิด</th>
+              <th class="num">% จำนวนการปิดงาน</th>
+              <th class="num">มูลค่าคงค้างรวม (บาท)</th>
+              <th class="num">มูลค่าโอนปิดรวม (บาท)</th>
+              <th class="num">% มูลค่าที่ปิด<span class="sub-th">(ใช้ตัดเกรด)</span></th>
               <th>เกรด</th>
               <th>ผลประเมิน</th>
-              <th>ต้องการอีกเพื่อผ่าน</th>
+              <th class="num">ต้องการมูลค่าอีกประมาณ (บาท)<span class="sub-th">เพื่อให้ผ่านเกณฑ์</span></th>
+              <th class="num">≈ จำนวนงานที่ต้องปิดเพิ่ม</th>
             </tr>
           </thead>
           <tbody id="official-grade-tbody-auc"></tbody>
         </table>
       </div>
       <div class="note">
-        แยกหมวดงานใหม่ (2.1/2.2) กับงานค้าง (1.1/1.2/1.3) โดยดูปีของ "วันเริ่มดำเนินการ" ของแต่ละงาน: งานที่เริ่มในปีปัจจุบันถือเป็นงานใหม่ งานที่เริ่มในปี 2568 เข้าเกณฑ์ 1.3 ส่วนที่เริ่มก่อนหน้านั้นเข้าเกณฑ์ 1.2 (สำหรับงบ I/P) — งานหมวด "หมู่บ้าน" (AUC) ไม่อยู่ในเกณฑ์ชุดนี้ (ตารางนี้ครอบคลุมเฉพาะ C/I/P); งานกลุ่มบ้านจัดสรรประเมินแยกในแท็บกำไร/ต้นทุน (ตาราง 5) · คอลัมน์ "ต้องการอีกเพื่อผ่าน" เป็นค่าประมาณจากมูลค่าเฉลี่ยของงานที่ยังเปิดอยู่ในหมวดนั้น (เพราะเกณฑ์ตัดเกรดคิดจากมูลค่า ไม่ใช่จำนวนงาน) จำนวนจริงอาจต่างไปขึ้นกับว่าปิดงานไหนก่อน
+        แยกหมวดงานใหม่ (2.1/2.2) กับงานค้าง (1.1/1.2/1.3) โดยดูปีของ "วันเริ่มดำเนินการ" ของแต่ละงาน: งานที่เริ่มในปีปัจจุบันถือเป็นงานใหม่ งานที่เริ่มในปี 2568 เข้าเกณฑ์ 1.3 ส่วนที่เริ่มก่อนหน้านั้นเข้าเกณฑ์ 1.2 (สำหรับงบ I/P) — งานหมวด "หมู่บ้าน" (AUC) ไม่อยู่ในเกณฑ์ชุดนี้ (ตารางนี้ครอบคลุมเฉพาะ C/I/P); งานกลุ่มบ้านจัดสรรประเมินแยกในแท็บกำไร/ต้นทุน (ตาราง 5) · วิธีอ่านตาราง: "% จำนวนการปิดงาน" = งานที่ปิดแล้ว ÷ งานทั้งหมด (ดูประกอบ) ส่วน "% มูลค่าที่ปิด" = มูลค่าโอนปิด ÷ (คงค้าง+โอนปิด) คือค่าที่ใช้ตัดเกรดตามเกณฑ์ · "ต้องการมูลค่าอีกประมาณ" คือมูลค่างานคงค้างที่ต้องโอนปิดเพิ่ม เพื่อให้ % มูลค่าที่ปิดถึงเกณฑ์ A++ ของเดือนที่เลือก (มูลค่ารวมคงที่ เพราะการปิดงานแค่ย้ายมูลค่าจากคงค้างไปเป็นโอนปิด) · "≈ จำนวนงาน" เป็นค่าประมาณจากมูลค่าเฉลี่ยของงานที่ยังเปิดอยู่ จำนวนจริงอาจต่างไปขึ้นกับว่าปิดงานไหนก่อน
       </div>
     </div>
 
@@ -408,23 +438,27 @@
     <div class="panel">
       <h2>เกณฑ์ตัดเกรดตามแผนปฏิบัติ สายงาน กต <span class="hint">เกณฑ์ผ่าน: A++ · % คำนวณจากต้นทุนจริง (ปิดแล้ว ÷ ทั้งหมด) เดือนเดียวกับแท็บงาน AUC</span></h2>
       <div class="table-wrap">
-        <table id="official-grade-table-profit">
+        <table id="official-grade-table-profit" class="grade-table">
           <thead>
             <tr>
               <th>หมวดงาน (ตามเกณฑ์ทางการ)</th>
               <th class="num">จำนวนงาน</th>
-              <th class="num">% มูลค่าที่ปิด</th>
+              <th class="num">จำนวนการปิดงาน</th>
+              <th class="num">% จำนวนการปิดงาน</th>
+              <th class="num">ต้นทุนจริงที่ยังไม่ปิด (บาท)</th>
+              <th class="num">ต้นทุนจริงที่ปิดแล้ว (บาท)</th>
+              <th class="num">% ต้นทุนที่ปิด<span class="sub-th">(ใช้ตัดเกรด)</span></th>
               <th>เกรด</th>
               <th>ผลประเมิน</th>
-              <th>ต้องการอีกเพื่อผ่าน</th>
-              
+              <th class="num">ต้องการต้นทุนปิดเพิ่มประมาณ (บาท)<span class="sub-th">เพื่อให้ผ่านเกณฑ์</span></th>
+              <th class="num">≈ จำนวนงานที่ต้องปิดเพิ่ม</th>
             </tr>
           </thead>
           <tbody id="official-grade-tbody-profit"></tbody>
         </table>
       </div>
       <div class="note">
-        ตาราง 4 ครอบคลุมงาน C02.2 ทั้งหมดที่ไม่ใช่บ้านจัดสรร · ตาราง 5 ครอบคลุมเฉพาะงานกลุ่มบ้านจัดสรรที่ "% พัสดุ" หรือ "% ค่าใช้จ่าย" ปัจจุบัน ≥80% (เกณฑ์ทางการระบุให้เช็ค ณ วันที่ 1 มี.ค. 2569 โดยเฉพาะ แต่ข้อมูลที่มีเป็นค่าล่าสุดเท่านั้น จึงเป็นค่าประมาณ ไม่ใช่ค่า ณ วันที่ดังกล่าวจริง) · ข้อมูลไม่มีคอลัมน์มูลค่าคงค้าง/โอนปิดแบบแท็บ AUC จึงใช้ "ต้นทุนจริง" แทนในการคำนวณ % แก้ไขเดือนที่ประเมินได้จากแท็บงาน AUC (ใช้เดือนเดียวกัน)
+        ตาราง 4 ครอบคลุมงาน C02.2 ทั้งหมดที่ไม่ใช่บ้านจัดสรร · ตาราง 5 ครอบคลุมเฉพาะงานกลุ่มบ้านจัดสรรที่ "% พัสดุ" หรือ "% ค่าใช้จ่าย" ปัจจุบัน ≥80% (เกณฑ์ทางการระบุให้เช็ค ณ วันที่ 1 มี.ค. 2569 โดยเฉพาะ แต่ข้อมูลที่มีเป็นค่าล่าสุดเท่านั้น จึงเป็นค่าประมาณ ไม่ใช่ค่า ณ วันที่ดังกล่าวจริง) · ข้อมูลไม่มีคอลัมน์มูลค่าคงค้าง/โอนปิดแบบแท็บ AUC จึงใช้ "ต้นทุนจริง" แทน (ต้นทุนงานที่ยังไม่ปิด = แทนมูลค่าคงค้าง, ต้นทุนงานที่ปิดแล้ว = แทนมูลค่าโอนปิด) เปลี่ยนเดือนที่ประเมินได้จากแท็บงาน AUC (ใช้เดือนเดียวกัน)
       </div>
     </div>
 
@@ -593,6 +627,9 @@ function renderChart(id, config) {
   const canvas = document.getElementById(id);
   if (!canvas) return;
   if (chartInstances[id]) chartInstances[id].destroy();
+  const cs = getComputedStyle(document.documentElement);
+  Chart.defaults.color = (cs.getPropertyValue('--text') || '#16202E').trim();
+  Chart.defaults.borderColor = (cs.getPropertyValue('--border') || '#DCE1E7').trim();
   chartInstances[id] = new Chart(canvas, config);
 }
 
@@ -1354,6 +1391,17 @@ function gradeFromTable(tableKey, monthIdx, pct) {
 // value. This is necessarily an approximation since the % is value-based,
 // not job-count-based — the actual number needed depends on which specific
 // jobs close.
+// Closing a job moves its value from "คงค้าง" to "โอนปิด", so the grand total
+// stays the same and only the closed share grows. The extra value that must
+// be closed to reach the pass mark is therefore total x target% - already closed.
+function valueNeededToPass(g, tableKey, monthIdx) {
+  const rl = gradeThresholdRow(tableKey, monthIdx);
+  if (!rl) return null;
+  const targetPct = rl.row[rl.row.length - 1];
+  if (!g.totalValue) return null;
+  return Math.max(0, g.totalValue * targetPct / 100 - g.closedValue);
+}
+
 function estimateJobsToPass(g, tableKey, monthIdx) {
   const rl = gradeThresholdRow(tableKey, monthIdx);
   if (!rl) return null;
@@ -1419,25 +1467,34 @@ function renderGradingTable(tbodyId, groups, monthIdx) {
   const order = ['1.1','2.1','1.2','1.3','2.2','4','5'];
   const rowsHtml = order.filter(k => groups[k]).map(k => {
     const g = groups[k];
-    const pct = g.totalValue ? (g.closedValue / g.totalValue * 100) : 0;
+    const pct = g.totalValue ? (g.closedValue / g.totalValue * 100) : 0;           // % by value (used for the grade)
+    const pctCount = g.count ? (g.closedCount / g.count * 100) : 0;                // % by job count
     const gr = gradeFromTable(k, monthIdx, pct);
-    let needCell = '-';
+
+    let needValueCell = '-', needJobsCell = '-';
     if (!gr.pass && !gr.noCriteria) {
+      const gap = valueNeededToPass(g, k, monthIdx);
+      needValueCell = gap === null ? 'ประมาณไม่ได้' : `~${fmtNum(Math.ceil(gap))}`;
       const need = estimateJobsToPass(g, k, monthIdx);
-      if (need === null) needCell = 'ประมาณไม่ได้';
-      else if (need === 0) needCell = 'เกือบถึงแล้ว (<1 งาน)';
-      else needCell = `~${fmtNum(need)} งาน`;
+      if (need === null) needJobsCell = 'ประมาณไม่ได้';
+      else if (need === 0) needJobsCell = '<1 งาน';
+      else needJobsCell = `~${fmtNum(need)} งาน`;
     }
     return `<tr>
       <td>${GRADE_TABLES[k].title}</td>
       <td class="num">${fmtNum(g.count)}</td>
-      <td class="num">${pct.toFixed(1)}%</td>
+      <td class="num">${fmtNum(g.closedCount)}</td>
+      <td class="num">${pctCount.toFixed(1)}%</td>
+      <td class="num">${fmtNum(g.openValue)}</td>
+      <td class="num">${fmtNum(g.closedValue)}</td>
+      <td class="num"><b>${pct.toFixed(1)}%</b></td>
       <td><span class="badge ${gradeBadgeClassOfficial(gr.grade)}">${gr.grade}</span></td>
       <td>${gr.pass ? '<span class="badge badge-CLSD">ผ่าน</span>' : (gr.noCriteria ? '-' : '<span class="badge badge-TECO">ยังไม่ผ่าน</span>')}</td>
-      <td>${needCell}</td>
+      <td class="num need-val">${needValueCell}</td>
+      <td class="num need-val">${needJobsCell}</td>
     </tr>`;
   }).join('');
-  el.innerHTML = rowsHtml || '<tr><td colspan="6"><div class="empty-state">ไม่มีงานที่เข้าเกณฑ์กลุ่มใดเลย</div></td></tr>';
+  el.innerHTML = rowsHtml || '<tr><td colspan="11"><div class="empty-state">ไม่มีงานที่เข้าเกณฑ์กลุ่มใดเลย</div></td></tr>';
 }
 
 let officialGradeMonthIdx = new Date().getMonth(); // 0 = ม.ค. ... 11 = ธ.ค., defaults to current month
@@ -1448,12 +1505,13 @@ function computeAucGradeGroups() {
   rows.forEach(r => {
     const key = aucGradeTableKey(r);
     if (!key) return;
-    if (!groups[key]) groups[key] = { count: 0, closedCount: 0, closedValue: 0, totalValue: 0 };
+    if (!groups[key]) groups[key] = { count: 0, closedCount: 0, closedValue: 0, openValue: 0, totalValue: 0 };
     const outstanding = Number(r['มูลค่าคงค้าง']) || 0;
     const transferred = Number(r['มูลค่าโอนปิด']) || 0;
     groups[key].count++;
     if (r['สถานะระบบ'] === 'CLSD') groups[key].closedCount++;
     groups[key].closedValue += transferred;
+    groups[key].openValue += outstanding;
     groups[key].totalValue += outstanding + transferred;
   });
   return groups;
@@ -1465,7 +1523,7 @@ function computeProfitGradeGroups() {
   rows.forEach(r => {
     const key = profitGradeTableKey(r);
     if (!key) return;
-    if (!groups[key]) groups[key] = { count: 0, closedCount: 0, closedValue: 0, totalValue: 0 };
+    if (!groups[key]) groups[key] = { count: 0, closedCount: 0, closedValue: 0, openValue: 0, totalValue: 0 };
     // Profit-tab rows have no มูลค่าคงค้าง/มูลค่าโอนปิด columns, so ต้นทุนจริง
     // (actual cost) is used as the value basis instead: closed-job cost vs
     // total cost of all jobs in the group.
@@ -1473,6 +1531,7 @@ function computeProfitGradeGroups() {
     groups[key].count++;
     groups[key].totalValue += cost;
     if (r['สถานะระบบ'] === 'CLSD') { groups[key].closedCount++; groups[key].closedValue += cost; }
+    else { groups[key].openValue += cost; }
   });
   return groups;
 }
@@ -1533,7 +1592,6 @@ function renderAucKpis(rows) {
   const total = rows.length;
   const outstanding = rows.reduce((s,r)=>s+(Number(r['มูลค่าคงค้าง'])||0),0);
   const transferred = rows.reduce((s,r)=>s+(Number(r['มูลค่าโอนปิด'])||0),0);
-  const avgMaterial = rows.length ? rows.reduce((s,r)=>s+(Number(r['% การเบิกจ่ายวัสดุ'])||0),0)/rows.length : 0;
   const closed = rows.filter(r=>r['สถานะระบบ']==='CLSD').length;
   const open = total - closed;
 
@@ -1549,7 +1607,6 @@ function renderAucKpis(rows) {
     {label:'ปิดงานแล้ว (CLSD)', value: fmtNum(closed), sub: `${fmtPct(pctByCount)} ของงานทั้งหมด (${open} งานยังเปิดอยู่)`, accent:'teal'},
     {label:'มูลค่าคงค้างรวม (บาท)', value: fmtNum(outstanding), sub:'งานที่ยังไม่ปิดบัญชี', accent:'amber'},
     {label:'มูลค่าโอนปิดรวม (บาท)', value: fmtNum(transferred), sub: `${fmtPct(pctByValue)} ของมูลค่ารวม (คงค้าง+โอนปิด)`, accent:'teal'},
-    {label:'% เบิกจ่ายวัสดุเฉลี่ย', value: fmtPct(avgMaterial), sub:'เฉลี่ยจากงานที่แสดงอยู่', accent:'steel'},
   ];
   document.getElementById('auc-kpis').innerHTML = kpis.map(k => `
     <div class="kpi-card accent-${k.accent}">
