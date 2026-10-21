@@ -211,6 +211,11 @@
   td.num, th.num { text-align: right; font-family: 'IBM Plex Mono', monospace; }
   td.job-code { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--fg-link); }
 
+  .reason-cell { white-space: normal; min-width: 150px; max-width: 200px; font-size: 11.5px; line-height: 1.35; }
+  #profit-table { font-size: 12px; }
+  #profit-table td:nth-child(2) { white-space: normal; min-width: 150px; max-width: 190px; }
+  #profit-table td:nth-child(11) { white-space: normal; max-width: 130px; }
+  #profit-table th, #profit-table td { padding-left: 6px; padding-right: 6px; }
   .grade-table { font-size: 12px; }
   .grade-table th { white-space: normal; min-width: 76px; padding: 8px 7px; line-height: 1.3; vertical-align: bottom; }
   .grade-table td { padding: 7px 8px; }
@@ -218,6 +223,10 @@
   .grade-table td:first-child { white-space: normal; min-width: 210px; }
   .grade-table .need-val { color: var(--b-amber-fg); font-weight: 600; }
   .grade-table td.num b { color: var(--text); }
+  .grade-table tr.grade-muted-row td { color: var(--text-dim); font-style: italic; }
+  .grade-table tr.grade-total-row td { font-weight: 700; border-top: 2px solid var(--border); background: var(--b-steel-bg); }
+  .inline-check { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text); cursor: pointer; margin: 0 0 12px; }
+  .inline-check input { accent-color: var(--fg-link); width: 15px; height: 15px; cursor: pointer; }
   .grade-table .sub-th { display: block; font-weight: 400; font-size: 10.5px; opacity: .85; }
   .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
   .badge-CLSD { background: var(--b-teal-bg); color: var(--b-teal-fg); }
@@ -309,6 +318,7 @@
         <label>ประเมินผลของเดือน</label>
         <select id="official-grade-month"></select>
       </div>
+      <label class="inline-check"><input type="checkbox" class="grade-include-exempt"> รวมงานที่ "ขอยกเว้นเกณฑ์วัด" ในการประเมินด้วย (ปกติไม่รวม)</label>
       <div class="table-wrap">
         <table id="official-grade-table-auc" class="grade-table">
           <thead>
@@ -437,6 +447,7 @@
 
     <div class="panel">
       <h2>เกณฑ์ตัดเกรดตามแผนปฏิบัติ สายงาน กต <span class="hint">เกณฑ์ผ่าน: A++ · % คำนวณจากต้นทุนจริง (ปิดแล้ว ÷ ทั้งหมด) เดือนเดียวกับแท็บงาน AUC</span></h2>
+      <label class="inline-check"><input type="checkbox" class="grade-include-exempt"> รวมงานที่ "ขอยกเว้นเกณฑ์วัด" ในการประเมินด้วย (ปกติไม่รวม)</label>
       <div class="table-wrap">
         <table id="official-grade-table-profit" class="grade-table">
           <thead>
@@ -458,7 +469,7 @@
         </table>
       </div>
       <div class="note">
-        ตาราง 4 ครอบคลุมงาน C02.2 ทั้งหมดที่ไม่ใช่บ้านจัดสรร · ตาราง 5 ครอบคลุมเฉพาะงานกลุ่มบ้านจัดสรรที่ "% พัสดุ" หรือ "% ค่าใช้จ่าย" ปัจจุบัน ≥80% (เกณฑ์ทางการระบุให้เช็ค ณ วันที่ 1 มี.ค. 2569 โดยเฉพาะ แต่ข้อมูลที่มีเป็นค่าล่าสุดเท่านั้น จึงเป็นค่าประมาณ ไม่ใช่ค่า ณ วันที่ดังกล่าวจริง) · ข้อมูลไม่มีคอลัมน์มูลค่าคงค้าง/โอนปิดแบบแท็บ AUC จึงใช้ "ต้นทุนจริง" แทน (ต้นทุนงานที่ยังไม่ปิด = แทนมูลค่าคงค้าง, ต้นทุนงานที่ปิดแล้ว = แทนมูลค่าโอนปิด) เปลี่ยนเดือนที่ประเมินได้จากแท็บงาน AUC (ใช้เดือนเดียวกัน)
+        ตาราง 4 ครอบคลุมงาน C02.2 ที่ "คิดค่าเกณฑ์" (ไม่รวมบ้านจัดสรร) · งานที่ "ขอยกเว้นเกณฑ์วัด" ไม่นำมาประเมิน แต่แสดงแยกเป็นอีกแถวและรวมอยู่ในแถว "รวมทุกงาน" ที่ตรงกับการ์ดสรุป (ติ๊กช่องด้านบนถ้าต้องการให้นับรวมด้วย) · ตาราง 5 ครอบคลุมเฉพาะงานกลุ่มบ้านจัดสรรที่ "% พัสดุ" หรือ "% ค่าใช้จ่าย" ปัจจุบัน ≥80% (เกณฑ์ทางการระบุให้เช็ค ณ วันที่ 1 มี.ค. 2569 โดยเฉพาะ แต่ข้อมูลที่มีเป็นค่าล่าสุดเท่านั้น จึงเป็นค่าประมาณ ไม่ใช่ค่า ณ วันที่ดังกล่าวจริง) · ข้อมูลไม่มีคอลัมน์มูลค่าคงค้าง/โอนปิดแบบแท็บ AUC จึงใช้ "ต้นทุนจริง" แทน (ต้นทุนงานที่ยังไม่ปิด = แทนมูลค่าคงค้าง, ต้นทุนงานที่ปิดแล้ว = แทนมูลค่าโอนปิด) เปลี่ยนเดือนที่ประเมินได้จากแท็บงาน AUC (ใช้เดือนเดียวกัน)
       </div>
     </div>
 
@@ -494,6 +505,13 @@
             <div class="ms-panel" id="p-status-panel"></div>
           </div>
         </div>
+        <div class="filter-field">
+          <label>ประเภทงาน C02.2</label>
+          <div class="ms-wrap" id="p-type-wrap">
+            <button type="button" class="ms-toggle" id="p-type-toggle">ทั้งหมด</button>
+            <div class="ms-panel" id="p-type-panel"></div>
+          </div>
+        </div>
         <button class="reset-btn" id="p-reset">ล้างตัวกรอง</button>
       </div>
     </div>
@@ -512,6 +530,8 @@
               <th data-key="กำไรจริง" class="num">กำไรจริง (บาท)<span class="arrow"></span></th>
               <th data-key="% Profit Margin" class="num">% Margin<span class="arrow"></span></th>
               <th data-key="% Markup" class="num">% Markup<span class="arrow"></span></th>
+              <th data-key="ประเภทงาน C02.2">ประเภทงาน C02.2<span class="arrow"></span></th>
+              <th data-key="เหตุผล">เหตุผล<span class="arrow"></span></th>
               <th data-key="ชื่อผู้คุมงาน">ผู้คุมงาน<span class="arrow"></span></th>
               <th data-key="__batchLabel">รอบข้อมูล<span class="arrow"></span></th>
             </tr>
@@ -649,6 +669,11 @@ function fmtFraction(v) {
 function statusBadge(s) {
   const cls = ['CLSD','REL','TECO'].includes(s) ? 'badge-'+s : 'badge-default';
   return `<span class="badge ${cls}">${s ?? '-'}</span>`;
+}
+function workTypeBadge(t) {
+  if (!t) return '-';
+  const cls = String(t).includes('ยกเว้น') ? 'badge-REL' : (t === 'บ้านจัดสรร' ? 'badge-default' : 'badge-CLSD');
+  return `<span class="badge ${cls}">${t}</span>`;
 }
 function periodBadge(s) {
   return `<span class="badge badge-period">${s ?? '-'}</span>`;
@@ -1111,7 +1136,7 @@ function handleFile(file) {
         type = 'auc';
         rows = objs.map(o => {
           const copy = {...o};
-          delete copy['เหตุผล']; delete copy['ผู้รับผิดชอบ'];
+          if (!copy['เหตุผล']) delete copy['เหตุผล']; delete copy['ผู้รับผิดชอบ'];
           copy['สังกัดผู้ควบคุมงาน_short'] = shortenOrg(copy['สังกัดผู้ควบคุมงาน']);
           copy['ช่างผู้คมงาน'] = copy['ช่างผู้คมงาน'] || 'ไม่ระบุ';
           copy['วันเริ่มดำเนินการ'] = excelDateToStr(copy['วันเริ่มดำเนินการ']);
@@ -1121,7 +1146,7 @@ function handleFile(file) {
         type = 'profit';
         rows = objs.map(o => {
           const copy = {...o};
-          delete copy['เหตุผล']; delete copy['ผู้รับผิดชอบ'];
+          if (!copy['เหตุผล']) delete copy['เหตุผล']; delete copy['ผู้รับผิดชอบ'];
           copy['สังกัดผู้คุมงาน_short'] = shortenOrg(copy['สังกัดผู้คุมงาน']);
           copy['ชื่อผู้คุมงาน'] = copy['ชื่อผู้คุมงาน'] || 'ไม่ระบุ';
           return copy;
@@ -1434,7 +1459,26 @@ function jobStartBEYear(row) {
   return y + 543;
 }
 
+// Jobs flagged "ขอยกเว้นเกณฑ์วัด" (exempt from the measurement criteria) are
+// not graded: the criteria sheet only measures jobs counted under the criteria
+// ("คิดค่าเกณฑ์"). They still appear on the page and in every total, and are
+// listed in their own row of the grading table so the numbers reconcile.
+// The checkbox above the table can pull them into the grade if ever wanted.
+let includeExemptInGrade = false;
+function isExemptRow(row) {
+  const t = String(row['ประเภทงาน C02.2'] ?? row['ประเภทงาน AUC'] ?? '');
+  return t.includes('ยกเว้น');
+}
+
+// Special (non-graded) buckets so that every job is accounted for somewhere.
+const GRADE_SPECIAL_TITLES = {
+  EXEMPT: 'ขอยกเว้นเกณฑ์วัด — ไม่นำมาประเมิน',
+  NOT_COVERED: 'งานหมู่บ้าน (บ้านจัดสรร) — ไม่อยู่ในเกณฑ์ชุดนี้ (ประเมินที่ตาราง 5 แท็บกำไร/ต้นทุน)',
+  NOT_ELIGIBLE: 'งานบ้านจัดสรรที่ % พัสดุ และ % ค่าใช้จ่าย ยังไม่ถึง 80% — ไม่เข้าเกณฑ์ตาราง 5'
+};
+
 function aucGradeTableKey(row) {
+  if (!includeExemptInGrade && isExemptRow(row)) return 'EXEMPT';
   const cur = currentBEYear();
   const cats = rowBudgetCategories(row);
   const startY = jobStartBEYear(row);
@@ -1445,18 +1489,19 @@ function aucGradeTableKey(row) {
     if (startY === 2568) return '1.3';
     return '1.2';
   }
-  return null; // หมู่บ้าน (AUC-side) isn't covered by this criteria sheet
+  return 'NOT_COVERED'; // หมู่บ้าน (AUC-side) isn't covered by this criteria sheet
 }
 
 function profitIsVillage(row) { return row['ประเภทงาน C02.2'] === 'บ้านจัดสรร'; }
 function profitGradeTableKey(row) {
+  if (!includeExemptInGrade && isExemptRow(row)) return 'EXEMPT';
   if (profitIsVillage(row)) {
     const mat = Number(row['% พัสดุ']) || 0;
     const exp = Number(row['% ค่าใช้จ่าย']) || 0;
     // Table 5's eligibility is a one-time snapshot taken 1 Mar 2569; we only
     // have each job's CURRENT %, so this is an approximation using current
     // values, not the true historical snapshot.
-    return (mat >= 0.8 || exp >= 0.8) ? '5' : null;
+    return (mat >= 0.8 || exp >= 0.8) ? '5' : 'NOT_ELIGIBLE';
   }
   return '4';
 }
@@ -1465,10 +1510,24 @@ function renderGradingTable(tbodyId, groups, monthIdx) {
   const el = document.getElementById(tbodyId);
   if (!el) return;
   const order = ['1.1','2.1','1.2','1.3','2.2','4','5'];
-  const rowsHtml = order.filter(k => groups[k]).map(k => {
-    const g = groups[k];
+  const specialOrder = ['EXEMPT','NOT_COVERED','NOT_ELIGIBLE'];
+
+  const common = (g) => {
     const pct = g.totalValue ? (g.closedValue / g.totalValue * 100) : 0;           // % by value (used for the grade)
     const pctCount = g.count ? (g.closedCount / g.count * 100) : 0;                // % by job count
+    return { pct, pctCount };
+  };
+  const numCells = (g, pct, pctCount) => `
+      <td class="num">${fmtNum(g.count)}</td>
+      <td class="num">${fmtNum(g.closedCount)}</td>
+      <td class="num">${pctCount.toFixed(1)}%</td>
+      <td class="num">${fmtNum(g.openValue)}</td>
+      <td class="num">${fmtNum(g.closedValue)}</td>
+      <td class="num"><b>${pct.toFixed(1)}%</b></td>`;
+
+  const gradedHtml = order.filter(k => groups[k]).map(k => {
+    const g = groups[k];
+    const { pct, pctCount } = common(g);
     const gr = gradeFromTable(k, monthIdx, pct);
 
     let needValueCell = '-', needJobsCell = '-';
@@ -1481,20 +1540,37 @@ function renderGradingTable(tbodyId, groups, monthIdx) {
       else needJobsCell = `~${fmtNum(need)} งาน`;
     }
     return `<tr>
-      <td>${GRADE_TABLES[k].title}</td>
-      <td class="num">${fmtNum(g.count)}</td>
-      <td class="num">${fmtNum(g.closedCount)}</td>
-      <td class="num">${pctCount.toFixed(1)}%</td>
-      <td class="num">${fmtNum(g.openValue)}</td>
-      <td class="num">${fmtNum(g.closedValue)}</td>
-      <td class="num"><b>${pct.toFixed(1)}%</b></td>
+      <td>${GRADE_TABLES[k].title}</td>${numCells(g, pct, pctCount)}
       <td><span class="badge ${gradeBadgeClassOfficial(gr.grade)}">${gr.grade}</span></td>
       <td>${gr.pass ? '<span class="badge badge-CLSD">ผ่าน</span>' : (gr.noCriteria ? '-' : '<span class="badge badge-TECO">ยังไม่ผ่าน</span>')}</td>
       <td class="num need-val">${needValueCell}</td>
       <td class="num need-val">${needJobsCell}</td>
     </tr>`;
   }).join('');
-  el.innerHTML = rowsHtml || '<tr><td colspan="11"><div class="empty-state">ไม่มีงานที่เข้าเกณฑ์กลุ่มใดเลย</div></td></tr>';
+
+  const specialHtml = specialOrder.filter(k => groups[k]).map(k => {
+    const g = groups[k];
+    const { pct, pctCount } = common(g);
+    return `<tr class="grade-muted-row">
+      <td>${GRADE_SPECIAL_TITLES[k]}</td>${numCells(g, pct, pctCount)}
+      <td>-</td><td><span class="badge badge-default">ไม่ประเมิน</span></td>
+      <td class="num">-</td><td class="num">-</td>
+    </tr>`;
+  }).join('');
+
+  // grand total = every job on the tab, so it matches the KPI cards exactly
+  const all = { count: 0, closedCount: 0, closedValue: 0, openValue: 0, totalValue: 0 };
+  Object.values(groups).forEach(g => { for (const f in all) all[f] += g[f]; });
+  const totalHtml = all.count ? (() => {
+    const { pct, pctCount } = common(all);
+    return `<tr class="grade-total-row">
+      <td>รวมทุกงานในแท็บนี้ (ตรงกับการ์ดสรุปด้านบน)</td>${numCells(all, pct, pctCount)}
+      <td>-</td><td>-</td><td class="num">-</td><td class="num">-</td>
+    </tr>`;
+  })() : '';
+
+  const body = gradedHtml + specialHtml + totalHtml;
+  el.innerHTML = body || '<tr><td colspan="11"><div class="empty-state">ไม่มีงานที่เข้าเกณฑ์กลุ่มใดเลย</div></td></tr>';
 }
 
 let officialGradeMonthIdx = new Date().getMonth(); // 0 = ม.ค. ... 11 = ธ.ค., defaults to current month
@@ -1539,6 +1615,18 @@ function computeProfitGradeGroups() {
 function renderOfficialGrading() {
   renderGradingTable('official-grade-tbody-auc', computeAucGradeGroups(), officialGradeMonthIdx);
   renderGradingTable('official-grade-tbody-profit', computeProfitGradeGroups(), officialGradeMonthIdx);
+}
+
+function initGradeExemptToggle() {
+  const boxes = document.querySelectorAll('.grade-include-exempt');
+  boxes.forEach(cb => {
+    cb.checked = includeExemptInGrade;
+    cb.addEventListener('change', () => {
+      includeExemptInGrade = cb.checked;
+      boxes.forEach(o => { o.checked = includeExemptInGrade; });
+      renderOfficialGrading();
+    });
+  });
 }
 
 function initOfficialGradeMonthSelect() {
@@ -1747,6 +1835,7 @@ function profitFiltered() {
     : dedupeByJobNumber(PROFIT_DATA);
   return base.filter(r => {
     if (!msMatches('p-status', r['สถานะระบบ'])) return false;
+    if (!msMatches('p-type', r['ประเภทงาน C02.2'])) return false;
     if (search) {
       const hay = (String(r['หมายเลขงาน']||'') + ' ' + String(r['คำอธิบาย']||'')).toLowerCase();
       if (!hay.includes(search)) return false;
@@ -1812,7 +1901,7 @@ function renderProfitTable() {
 
   const tbody = document.getElementById('profit-tbody');
   if (pageRows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state">ไม่พบงานที่ตรงกับตัวกรอง</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty-state">ไม่พบงานที่ตรงกับตัวกรอง</div></td></tr>`;
   } else {
     tbody.innerHTML = pageRows.map(r => `
       <tr>
@@ -1824,6 +1913,8 @@ function renderProfitTable() {
         <td class="num">${fmtNum(r['กำไรจริง'])}</td>
         <td class="num">${fmtFraction(r['% Profit Margin'])}</td>
         <td class="num">${fmtFraction(r['% Markup'])}</td>
+        <td>${workTypeBadge(r['ประเภทงาน C02.2'])}</td>
+        <td class="reason-cell">${r['เหตุผล'] || '-'}</td>
         <td>${r['ชื่อผู้คุมงาน']||'-'}</td>
         <td>${periodBadge(r['__batchLabel'])}</td>
       </tr>`).join('');
@@ -1851,15 +1942,17 @@ function initProfitFilters() {
 
   msInit('p-period', () => { profitState.page = 1; renderProfitTable(); });
   msInit('p-status', () => { profitState.page = 1; renderProfitTable(); });
+  msInit('p-type', () => { profitState.page = 1; renderProfitTable(); });
 
   msPopulate('p-period', profitBatches.map(m => m.id), periodLabels);
   msPopulate('p-status', uniqueSorted(PROFIT_DATA, 'สถานะระบบ'));
+  msPopulate('p-type', uniqueSorted(PROFIT_DATA, 'ประเภทงาน C02.2'));
 
   if (!initProfitFilters._bound) {
     document.getElementById('p-search').addEventListener('input', () => { profitState.page = 1; renderProfitTable(); });
     document.getElementById('p-reset').addEventListener('click', () => {
       document.getElementById('p-search').value = '';
-      ['p-period','p-status'].forEach(id => msClear(id));
+      ['p-period','p-status','p-type'].forEach(id => msClear(id));
       profitState.page = 1; renderProfitTable();
     });
     document.querySelectorAll('#profit-table thead th').forEach(th => {
@@ -1894,6 +1987,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 initUploadUI();
 initSettingsUI();
 initOfficialGradeMonthSelect();
+initGradeExemptToggle();
 initApi();
 </script>
 </body>
